@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест API + БД</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="max-w-md w-full mx-auto p-6 bg-white rounded-2xl shadow-lg">
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">🧪 Тест связи</h1>
+        <p class="text-gray-500 text-sm mb-6">Проверка: GitHub Pages → Render (FastAPI) → Neon (PostgreSQL)</p>
+        
+        <!-- Форма -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Ваше имя</label>
+                <input type="text" id="name" value="Стажер"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Сообщение</label>
+                <input type="text" id="message" value="Привет из GitHub Pages!"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <button id="sendBtn"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                Отправить на бэкенд
+            </button>
+            
+            <button id="historyBtn"
+                    class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-lg transition">
+                Показать историю (БД)
+            </button>
+        </div>
+        
+        <!-- Результат -->
+        <div id="result" class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 min-h-[80px]">
+            <p class="text-gray-400 text-sm">Результат появится здесь...</p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "https://k-6a3f.onrender.com";
+        
+        const resultDiv = document.getElementById('result');
+        const sendBtn = document.getElementById('sendBtn');
+        const historyBtn = document.getElementById('historyBtn');
+        
+        function showResult(data) {
+            resultDiv.innerHTML = `<pre class="text-xs whitespace-pre-wrap">${JSON.stringify(data, null, 2)}</pre>`;
+        }
+        
+        function showError(text) {
+            resultDiv.innerHTML = `<p class="text-red-500 text-sm">❌ ${text}</p>`;
+        }
+        
+        sendBtn.addEventListener('click', async () => {
+            const name = document.getElementById('name').value || 'Аноним';
+            const message = document.getElementById('message').value || 'Без сообщения';
+            
+            resultDiv.innerHTML = `<p class="text-gray-500 text-sm">⏳ Отправляем...</p>`;
+            
+            try {
+                const res = await fetch(`${API_BASE}/ping`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, message })
+                });
+                
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(`HTTP ${res.status}: ${text}`);
+                }
+                
+                const data = await res.json();
+                showResult(data);
+            } catch (e) {
+                showError(e.message);
+            }
+        });
+        
+        historyBtn.addEventListener('click', async () => {
+            resultDiv.innerHTML = `<p class="text-gray-500 text-sm">⏳ Загружаем историю...</p>`;
+            
+            try {
+                const res = await fetch(`${API_BASE}/history`);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                const data = await res.json();
+                showResult(data);
+            } catch (e) {
+                showError(e.message);
+            }
+        });
+    </script>
+</body>
+</html>
