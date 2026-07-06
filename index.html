@@ -8,15 +8,79 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">Риск-Анализ</div>
+        <div class="logo">Логотип</div>
+        <ul class="nav-links">
+            <li><a href="#storiesSection">Истории из жизни</a></li>
+            <li><a href="#faqSection">Вопросы и ответы</a></li>
+        </ul>
     </nav>
     <main>
         <div class="content">
-            <h1>Проверьте квартиру перед покупкой</h1>
-            <p class="subtext">Введите адрес объекта, чтобы получить оценку рисков и рекомендации перед сделкой.</p>
-            <div class="search-wrapper">
-                <input type="text" class="search-input" placeholder="Город, улица, дом, квартира" />
-                <button class="search-btn">Проверить</button>
+            <div class="two-columns">
+                <div class="left-column">
+                    <h1>Проверьте квартиру перед покупкой</h1>
+                    <p class="subtext">Введите адрес объекта, чтобы посмотреть его на карте, найти ближайшие МФЦ и перейти к проверке сделки.</p>
+                    <div class="search-wrapper has-btn">
+                        <input type="text" class="search-input" placeholder="Город, улица, дом, квартира" />
+                        <button class="search-btn">Проверить</button>
+                    </div>
+                    <div class="instruction-block">
+                        <h3>С чего начать покупку</h3>
+                        <p class="instruction-text">Пошаговая инструкция для покупателя: что проверить, какие документы запросить и как подготовиться к сделке.</p>
+                        <button class="instruction-btn">Открыть инструкцию →</button>
+                    </div>
+                </div>
+                <div class="right-column">
+                    <h4>Поиск по статьям, документам и вопросам</h4>
+                    <div class="search-wrapper">
+                        <input type="text" class="search-input" placeholder="Покупка квартиры" />
+                    </div>
+                    <div class="nav-block">
+                        <h5>Может быть полезно</h5>
+                        <ul class="nav-list">
+                            <li><a href="#">Статьи →</a></li>
+                            <li><a href="#">Документы →</a></li>
+                            <li><a href="#">Оценить риски →</a></li>
+                            <li><a href="#">Региональные особенности →</a></li>
+                            <li><a href="#">Проверить риелтора →</a></li>
+                            <li><a href="#">Шаблоны документов →</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="stories-section" id="storiesSection">
+                <h2>Истории из жизни</h2>
+                <div class="stories-carousel">
+                    <button class="scroll-btn scroll-left" id="scrollLeft">‹</button>
+                    <div class="stories-wrapper" id="storiesWrapper">
+                        <div class="stories-grid">
+                            <div class="story-card"></div>
+                            <div class="story-card"></div>
+                            <div class="story-card"></div>
+                            <div class="story-card"></div>
+                            <div class="story-card"></div>
+                            <div class="story-card"></div>
+                        </div>
+                    </div>
+                    <button class="scroll-btn scroll-right" id="scrollRight">›</button>
+                </div>
+            </div>
+            <div class="faq-section" id="faqSection">
+                <h2>Вопросы и ответы</h2>
+                <div class="faq-grid">
+                    <div class="faq-item">
+                        <div class="faq-question">Вопрос 1</div>
+                        <div class="faq-answer">Ответ на первый вопрос</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Вопрос 2</div>
+                        <div class="faq-answer">Ответ на второй вопрос</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question">Вопрос 3</div>
+                        <div class="faq-answer">Ответ на третий вопрос</div>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
