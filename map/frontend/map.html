@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>GIS Widget</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <!-- Turf.js (геоаналитика) -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+    <script src="widget.js" defer></script>
+</head>
+
+<body>
+
+<h2>Гео-аналитика недвижимости</h2>
+
+<div id="widget-layout">
+
+    <div id="left-column">
+        <div id="map"></div>
+
+        <div id="radius-control">
+            <label for="radius-slider">
+                Радиус поиска:
+                <span id="radius-value">500</span>
+            </label>
+
+            <input
+                type="range"
+                id="radius-slider"
+                min="50"
+                max="5000"
+                step="50"
+                value="1000">
+        </div>
+    </div>
+
+    <div id="analysis-panel">
+        <h3>Результаты анализа</h3>
+        <div id="analysis-content">
+            Анализ не выполнен.
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
