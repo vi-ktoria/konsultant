@@ -10,6 +10,9 @@
     <nav class="navbar">
         <div class="logo">Логотип</div>
         <ul class="nav-links">
+            <li><a href="index.html">Главная</a></li>
+            <li><a href="#">Статьи</a></li>
+            <li><a href="#templatesSection">Шаблоны документов</a></li>
             <li><a href="#storiesSection">Истории из жизни</a></li>
             <li><a href="#faqSection">Вопросы и ответы</a></li>
         </ul>
@@ -18,16 +21,16 @@
         <div class="content">
             <div class="two-columns">
                 <div class="left-column">
-                    <h1>Проверьте квартиру перед покупкой</h1>
-                    <p class="subtext">Введите адрес объекта, чтобы посмотреть его на карте, найти ближайшие МФЦ и перейти к проверке сделки.</p>
-                    <div class="search-wrapper has-btn">
-                        <input type="text" class="search-input" placeholder="Город, улица, дом, квартира" />
-                        <button class="search-btn">Проверить</button>
-                    </div>
                     <div class="instruction-block">
                         <h3>С чего начать покупку</h3>
                         <p class="instruction-text">Пошаговая инструкция для покупателя: что проверить, какие документы запросить и как подготовиться к сделке.</p>
                         <button class="instruction-btn">Открыть инструкцию →</button>
+                    </div>
+                    <h1>Проверьте квартиру перед покупкой</h1>
+                    <p class="subtext">Введите адрес объекта, чтобы посмотреть геоаналитику.</p>
+                    <div class="search-wrapper has-btn">
+                        <input type="text" class="search-input" placeholder="Город, улица, дом, квартира" />
+                        <button class="search-btn">Проверить</button>
                     </div>
                 </div>
                 <div class="right-column">
@@ -36,35 +39,83 @@
                         <input type="text" class="search-input" placeholder="Покупка квартиры" />
                     </div>
                     <div class="nav-block">
-                        <h5>Может быть полезно</h5>
+                        <h5>Полезные материалы</h5>
                         <ul class="nav-list">
-                            <li><a href="#">Статьи →</a></li>
-                            <li><a href="#">Документы →</a></li>
-                            <li><a href="#">Оценить риски →</a></li>
+                            <li><a href="#">Риски при покупке квартиры →</a></li>
                             <li><a href="#">Региональные особенности →</a></li>
-                            <li><a href="#">Проверить риелтора →</a></li>
-                            <li><a href="#">Шаблоны документов →</a></li>
+                            <li><a href="#">Как проверить риелтора →</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
+
+            <div class="templates-section" id="templatesSection">
+                <h2>Шаблоны документов</h2>
+                <div class="templates-carousel">
+                    <button class="scroll-btn scroll-left templates-scroll-left">‹</button>
+                    <div class="templates-wrapper">
+                        <div class="templates-grid">
+                            <div class="template-card">
+                                <img src="static/images/dogovor_kupli_prodagi.png" alt="Договор купли-продажи" class="template-image" />
+                                <div class="template-overlay">
+                                    <h3 class="template-title">Договор купли-продажи</h3>
+                                    <p class="template-excerpt">Открыть шаблон →</p>
+                                </div>
+                            </div>
+                            <div class="template-card">
+                                <div class="template-preview">
+                                    <div class="template-image-placeholder"></div>
+                                    
+                                </div>
+                            </div>
+                            <div class="template-card">
+                                <div class="template-preview">
+                                    <div class="template-image-placeholder"></div>
+                                    
+                                </div>
+                            </div>
+                            <div class="template-card">
+                                <div class="template-preview">
+                                    <div class="template-image-placeholder"></div>
+                                    
+                                </div>
+                            </div>
+                            <div class="template-card">
+                                <div class="template-preview">
+                                    <div class="template-image-placeholder"></div>
+                                    
+                                </div>
+                            </div>
+                            <div class="template-card">
+                                <div class="template-preview">
+                                    <div class="template-image-placeholder"></div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="scroll-btn scroll-right templates-scroll-right">›</button>
+                </div>
+            </div>
+
             <div class="stories-section" id="storiesSection">
                 <h2>Истории из жизни</h2>
                 <div class="stories-carousel">
                     <button class="scroll-btn scroll-left" id="scrollLeft">‹</button>
                     <div class="stories-wrapper" id="storiesWrapper">
-                        <div class="stories-grid">
-                            <div class="story-card"></div>
-                            <div class="story-card"></div>
-                            <div class="story-card"></div>
-                            <div class="story-card"></div>
-                            <div class="story-card"></div>
-                            <div class="story-card"></div>
-                        </div>
+                        <div class="stories-grid" id="storiesGrid"></div>
                     </div>
                     <button class="scroll-btn scroll-right" id="scrollRight">›</button>
                 </div>
             </div>
+
+            <div class="modal-overlay" id="storyModal">
+                <div class="modal-content" id="modalContent">
+                    <button class="modal-close" id="closeModalBtn">×</button>
+                    <div id="modalBody"></div>
+                </div>
+            </div>
+
             <div class="faq-section" id="faqSection">
                 <h2>Вопросы и ответы</h2>
                 <div class="faq-grid">
@@ -84,6 +135,7 @@
             </div>
         </div>
     </main>
+    <script src="static/js/stories.js"></script>
     <script src="static/js/main.js"></script>
 </body>
 </html>

@@ -1,16 +1,22 @@
 const API_BASE = "https://k-6a3f.onrender.com";
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+    // ===== Плавный скролл =====
+    const navbarHeight = document.querySelector('.navbar').offsetHeight;
+
+    function smoothScroll(targetId) {
+        const target = document.querySelector(targetId);
+        if (target) {
+            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
+            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+        }
+    }
+
     const historyLink = document.querySelector('.nav-links a[href="#storiesSection"]');
     if (historyLink) {
         historyLink.addEventListener('click', function(e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                const navbarHeight = document.querySelector('.navbar').offsetHeight;
-                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
-                window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-            }
+            smoothScroll('#storiesSection');
         });
     }
 
@@ -18,66 +24,177 @@ document.addEventListener('DOMContentLoaded', () => {
     if (faqLink) {
         faqLink.addEventListener('click', function(e) {
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                const navbarHeight = document.querySelector('.navbar').offsetHeight;
-                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
-                window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+            smoothScroll('#faqSection');
+        });
+    }
+
+    const templatesLink = document.querySelector('.nav-links a[href="#templatesSection"]');
+    if (templatesLink) {
+        templatesLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            smoothScroll('#templatesSection');
+        });
+    }
+
+    // ===== Рендеринг историй =====
+    function renderStories() {
+        const grid = document.getElementById('storiesGrid');
+        if (!grid || !storiesData || storiesData.length === 0) return;
+
+        grid.innerHTML = '';
+
+        storiesData.forEach(story => {
+            const card = document.createElement('div');
+            card.className = 'story-card';
+            card.dataset.storyId = story.id;
+
+            card.innerHTML = `
+                <div class="story-preview">
+                    <h3 class="story-title">${story.title}</h3>
+                    <p class="story-excerpt">${story.excerpt}</p>
+                </div>
+            `;
+
+            card.addEventListener('click', function() {
+                openStoryModal(story.id);
+            });
+
+            grid.appendChild(card);
+        });
+
+        const emptyCardsCount = Math.max(0, 6 - storiesData.length);
+        for (let i = 0; i < emptyCardsCount; i++) {
+            const emptyCard = document.createElement('div');
+            emptyCard.className = 'story-card empty-card';
+            grid.appendChild(emptyCard);
+        }
+    }
+
+    // ===== Открытие модального окна =====
+    function openStoryModal(storyId) {
+        const story = storiesData.find(s => s.id === storyId);
+        if (!story) return;
+
+        const modal = document.getElementById('storyModal');
+        const modalBody = document.getElementById('modalBody');
+
+        modalBody.innerHTML = `
+            <h2 class="modal-title">${story.title}</h2>
+            ${story.content}
+        `;
+
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    // ===== Закрытие модального окна =====
+    const modal = document.getElementById('storyModal');
+    const closeBtn = document.getElementById('closeModalBtn');
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', function() {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.classList.contains('active')) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
             }
         });
     }
 
+    // ===== Блок историй =====
     const wrapper = document.getElementById('storiesWrapper');
     const leftBtn = document.getElementById('scrollLeft');
     const rightBtn = document.getElementById('scrollRight');
 
-    if (!wrapper || !leftBtn || !rightBtn) return;
+    if (wrapper && leftBtn && rightBtn) {
+        const cardWidth = 320 + 24;
 
-    const cardWidth = 280 + 24;
+        function getVisibleCount() {
+            const wrapperWidth = wrapper.clientWidth;
+            return Math.max(1, Math.floor(wrapperWidth / cardWidth));
+        }
 
-    function getVisibleCount() {
-        const wrapperWidth = wrapper.clientWidth;
-        const visible = Math.floor(wrapperWidth / cardWidth);
-        return visible > 0 ? visible : 1;
+        function getMaxScroll() {
+            return Math.max(0, wrapper.scrollWidth - wrapper.clientWidth);
+        }
+
+        function scrollLeft() {
+            const step = cardWidth * getVisibleCount();
+            wrapper.scrollTo({ left: Math.max(0, wrapper.scrollLeft - step), behavior: 'smooth' });
+        }
+
+        function scrollRight() {
+            const step = cardWidth * getVisibleCount();
+            wrapper.scrollTo({ left: Math.min(getMaxScroll(), wrapper.scrollLeft + step), behavior: 'smooth' });
+        }
+
+        function updateButtons() {
+            const currentScroll = wrapper.scrollLeft;
+            const maxScroll = getMaxScroll();
+            leftBtn.style.opacity = currentScroll > 10 ? '1' : '0.3';
+            rightBtn.style.opacity = currentScroll < maxScroll - 10 ? '1' : '0.3';
+        }
+
+        leftBtn.addEventListener('click', scrollLeft);
+        rightBtn.addEventListener('click', scrollRight);
+        wrapper.addEventListener('scroll', updateButtons);
+        window.addEventListener('resize', updateButtons);
+        setTimeout(updateButtons, 100);
     }
 
-    function getMaxScroll() {
-        const totalWidth = wrapper.scrollWidth;
-        const visibleWidth = wrapper.clientWidth;
-        return Math.max(0, totalWidth - visibleWidth);
+    // ===== Блок шаблонов документов =====
+    const templatesWrapper = document.querySelector('.templates-wrapper');
+    const templatesLeftBtn = document.querySelector('.templates-scroll-left');
+    const templatesRightBtn = document.querySelector('.templates-scroll-right');
+
+    if (templatesWrapper && templatesLeftBtn && templatesRightBtn) {
+        const cardWidth = 320 + 24;
+
+        function getTemplatesVisibleCount() {
+            const wrapperWidth = templatesWrapper.clientWidth;
+            return Math.max(1, Math.floor(wrapperWidth / cardWidth));
+        }
+
+        function getTemplatesMaxScroll() {
+            return Math.max(0, templatesWrapper.scrollWidth - templatesWrapper.clientWidth);
+        }
+
+        function templatesScrollLeft() {
+            const step = cardWidth * getTemplatesVisibleCount();
+            templatesWrapper.scrollTo({ left: Math.max(0, templatesWrapper.scrollLeft - step), behavior: 'smooth' });
+        }
+
+        function templatesScrollRight() {
+            const step = cardWidth * getTemplatesVisibleCount();
+            templatesWrapper.scrollTo({ left: Math.min(getTemplatesMaxScroll(), templatesWrapper.scrollLeft + step), behavior: 'smooth' });
+        }
+
+        function updateTemplatesButtons() {
+            const currentScroll = templatesWrapper.scrollLeft;
+            const maxScroll = getTemplatesMaxScroll();
+            templatesLeftBtn.style.opacity = currentScroll > 10 ? '1' : '0.3';
+            templatesRightBtn.style.opacity = currentScroll < maxScroll - 10 ? '1' : '0.3';
+        }
+
+        templatesLeftBtn.addEventListener('click', templatesScrollLeft);
+        templatesRightBtn.addEventListener('click', templatesScrollRight);
+        templatesWrapper.addEventListener('scroll', updateTemplatesButtons);
+        window.addEventListener('resize', updateTemplatesButtons);
+        setTimeout(updateTemplatesButtons, 100);
     }
 
-    function scrollLeft() {
-        const currentScroll = wrapper.scrollLeft;
-        const visibleCount = getVisibleCount();
-        const step = cardWidth * visibleCount;
-        const target = Math.max(0, currentScroll - step);
-        wrapper.scrollTo({ left: target, behavior: 'smooth' });
-    }
-
-    function scrollRight() {
-        const currentScroll = wrapper.scrollLeft;
-        const visibleCount = getVisibleCount();
-        const step = cardWidth * visibleCount;
-        const maxScroll = getMaxScroll();
-        const target = Math.min(maxScroll, currentScroll + step);
-        wrapper.scrollTo({ left: target, behavior: 'smooth' });
-    }
-
-    function updateButtons() {
-        const currentScroll = wrapper.scrollLeft;
-        const maxScroll = getMaxScroll();
-        leftBtn.style.opacity = currentScroll > 10 ? '1' : '0.3';
-        rightBtn.style.opacity = currentScroll < maxScroll - 10 ? '1' : '0.3';
-    }
-
-    leftBtn.addEventListener('click', scrollLeft);
-    rightBtn.addEventListener('click', scrollRight);
-    wrapper.addEventListener('scroll', updateButtons);
-
-    window.addEventListener('resize', () => {
-        updateButtons();
-    });
-
-    setTimeout(updateButtons, 100);
+    renderStories();
 });
