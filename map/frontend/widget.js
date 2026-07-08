@@ -56,6 +56,22 @@ async function initGeoWidget() {
         return;
     }
 
+    const panel = document.getElementById("analysis-content");
+    if (panel) {
+        panel.innerHTML = `<div>⏳ Ищем объекты поблизости... это может занять до минуты.</div>`;
+    }
+
+    // ДАННЫЕ (грузим ДО создания карты — если backend недоступен,
+    // не хотим создавать Leaflet-объект, который потом придётся ломать)
+    let geoData;
+    try {
+        geoData = await loadGeoData(address);
+    } catch (err) {
+        console.error(err);
+        showFatalError(err.message);
+        return;
+    }
+
     // КАРТА
     const map = L.map('map').setView([55.7558, 37.6176], 11);
     map.attributionControl.setPrefix(false);
@@ -68,6 +84,10 @@ async function initGeoWidget() {
         road: "🛣 Автомагистраль",
         chemical: "☣ Химическое предприятие",
         agriculture: "🌾 Сельскохозяйственный объект",
+        airport: "✈ Аэропорт",
+        station: "🚉 Вокзал / ж-д станция",
+        cemetery: "⚰ Кладбище",
+        depot: "🚉 Депо / электродепо",
         unknown: "❔ Прочий объект"
     };
 
@@ -81,16 +101,6 @@ async function initGeoWidget() {
         iconAnchor: [15, 15],
         popupAnchor: [0, -35]
     });
-
-    // ОБЪЕКТ НЕДВИЖИМОСТИ + ПРОБЛЕМНЫЕ ОБЪЕКТЫ (одним запросом к backend)
-    let geoData;
-    try {
-        geoData = await loadGeoData(address);
-    } catch (err) {
-        console.error(err);
-        showFatalError(err.message);
-        return;
-    }
 
     const property = {
         coords: geoData.property.coords,

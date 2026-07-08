@@ -17,12 +17,22 @@ app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 // Максимальный радиус, на который грузим объекты за один запрос.
-// Слайдер на фронте (до 5000 м) дальше просто фильтрует уже загруженные
+// Слайдер на фронте дальше просто фильтрует уже загруженные
 // данные без повторных обращений к Overpass.
-const MAX_RADIUS_M = 5000;
+// 2500 м подобрано опытным путём: 5000 м слишком нагружает публичный
+// Overpass для регионов подальше от основных дата-центров (Владивосток,
+// СПб) и запрос стабильно улетает в таймаут.
+const MAX_RADIUS_M = 2500;
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
-const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+
+// Публичный overpass-api.de часто перегружен и отдаёт 504.
+// Пробуем несколько зеркал по очереди, пока одно не ответит.
+const OVERPASS_URLS = [
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.kumi.systems/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter"
+];
 
 // Nominatim и Overpass требуют указывать нормальный User-Agent
 const HEADERS = {
@@ -70,39 +80,73 @@ async function geocodeAddress(address) {
 function buildOverpassQuery(lat, lon, radius) {
     // around:radius,lat,lon — геопоиск в радиусе (в метрах) от точки
     return `
-        [out:json][timeout:25];
-        (
-          way["landuse"="industrial"](around:${radius},${lat},${lon});
-          way["man_made"="works"](around:${radius},${lat},${lon});
-          way["landuse"="landfill"](around:${radius},${lat},${lon});
-          node["landuse"="landfill"](around:${radius},${lat},${lon});
-          node["amenity"="waste_disposal"](around:${radius},${lat},${lon});
-          way["railway"="rail"](around:${radius},${lat},${lon});
-          way["highway"~"^(motorway|trunk)$"](around:${radius},${lat},${lon});
-          way["landuse"~"^(farmland|farmyard)$"](around:${radius},${lat},${lon});
-        );
-        out geom;
-    `;
+            [out:json][timeout:25];
+            (
+            way["landuse"~"^(industrial|landfill|farmland|farmyard|railway|cemetery)$"](around:${radius},${lat},${lon});
+            node["landuse"="landfill"](around:${radius},${lat},${lon});
+            way["man_made"="works"](around:${radius},${lat},${lon});
+            way["railway"~"^(rail|station|depot)$"](around:${radius},${lat},${lon});
+            node["railway"~"^(station|depot)$"](around:${radius},${lat},${lon});
+            way["highway"~"^(motorway|trunk)$"](around:${radius},${lat},${lon});
+            way["aeroway"="aerodrome"](around:${radius},${lat},${lon});
+            node["aeroway"="aerodrome"](around:${radius},${lat},${lon});
+            way["amenity"="grave_yard"](around:${radius},${lat},${lon});
+            node["amenity"="grave_yard"](around:${radius},${lat},${lon});
+            );
+            out geom;
+        `;
+}
+
+async function tryOverpassUrl(url, query, timeoutMs) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                ...HEADERS,
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "data=" + encodeURIComponent(query),
+            signal: controller.signal
+        });
+
+        if (!response.ok) {
+            throw new Error(`статус ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.elements || [];
+
+    } finally {
+        clearTimeout(timer);
+    }
 }
 
 async function fetchProblemObjects(lat, lon, radius) {
     const query = buildOverpassQuery(lat, lon, radius);
 
-    const response = await fetch(OVERPASS_URL, {
-        method: "POST",
-        headers: {
-            ...HEADERS,
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "data=" + encodeURIComponent(query)
-    });
+    let lastError;
 
-    if (!response.ok) {
-        throw new Error(`Overpass вернул статус ${response.status}`);
+    // Пробуем зеркала по очереди: публичный Overpass нестабилен и часто
+    // отдаёт 504 под нагрузкой, поэтому не полагаемся на один инстанс.
+    // ВАЖНО: внешний таймаут должен быть БОЛЬШЕ внутреннего [timeout:25]
+    // в самом Overpass-запросе — иначе мы сами обрываем соединение раньше,
+    // чем Overpass успевает честно досчитать и вернуть ответ (именно это
+    // происходило для городов подальше от основных дата-центров Overpass).
+    for (const url of OVERPASS_URLS) {
+        for (let attempt = 1; attempt <= 2; attempt++) {
+            try {
+                return await tryOverpassUrl(url, query, 35000);
+            } catch (err) {
+                console.warn(`Overpass ${url} попытка ${attempt} не удалась: ${err.message}`);
+                lastError = err;
+            }
+        }
     }
 
-    const data = await response.json();
-    return data.elements || [];
+    throw new Error(`все зеркала Overpass недоступны (последняя ошибка: ${lastError.message})`);
 }
 
 // ---------- КОНВЕРТЕР Overpass -> формат виджета ----------
@@ -112,20 +156,31 @@ const CATEGORY_LABELS = {
     waste: "Полигон ТБО",
     railway: "Железная дорога",
     road: "Автомагистраль",
-    agriculture: "Сельскохозяйственный объект"
+    agriculture: "Сельскохозяйственный объект",
+    airport: "Аэропорт",
+    station: "Вокзал / ж-д станция",
+    cemetery: "Кладбище",
+    depot: "Депо / ж-д парк",
 };
 
 function detectCategory(tags) {
     if (tags.landuse === "industrial" || tags.man_made === "works") return "industry_zone";
-    if (tags.landuse === "landfill" || tags.amenity === "waste_disposal") return "waste";
+    if (tags.landuse === "landfill") return "waste";
+    if (tags.aeroway === "aerodrome") return "airport";
+    // важно проверить railway=station ДО общей проверки на railway,
+    // иначе вокзалы попадут в категорию "железная дорога"
+    if (tags.railway === "depot" || tags.landuse === "railway") return "depot";
+    if (tags.railway === "station") return "station";
     if (tags.railway) return "railway";
     if (tags.highway) return "road";
     if (tags.landuse === "farmland" || tags.landuse === "farmyard") return "agriculture";
+    if (tags.landuse === "cemetery" || tags.amenity === "grave_yard") return "cemetery";
     return "unknown";
 }
 
 // Линии (ж/д пути, трассы) — открытая геометрия.
-// Всё остальное (промзоны, ТБО, с/х) — площадные объекты (полигоны).
+// Всё остальное (промзоны, ТБО, с/х, аэропорты, вокзалы, кладбища) —
+// площадные объекты (полигоны) либо точки, если так замаплено в OSM.
 function isLineCategory(category) {
     return category === "railway" || category === "road";
 }
