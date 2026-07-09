@@ -58,7 +58,7 @@ async function initGeoWidget() {
 
     const panel = document.getElementById("analysis-content");
     if (panel) {
-        panel.innerHTML = `<div>⏳ Ищем объекты поблизости... это может занять до минуты.</div>`;
+        panel.innerHTML = `<div>⏳ Ищем объекты поблизости... это может занять несколько минут.</div>`;
     }
 
     // ДАННЫЕ (грузим ДО создания карты — если backend недоступен,
@@ -88,8 +88,58 @@ async function initGeoWidget() {
         station: "🚉 Вокзал / ж-д станция",
         cemetery: "⚰ Кладбище",
         depot: "🚉 Депо / электродепо",
+        metro: "🚇 Станция метро",
+        metro_line: "🚇 Линия метро",
         unknown: "❔ Прочий объект"
     };
+
+    const CATEGORY_RISK = {
+        industry_zone: "high",
+        waste: "high",
+        chemical: "high",
+        railway: "medium",
+        road: "medium",
+        airport: "medium",
+        depot: "medium",
+        metro_line: 'medium',
+        agriculture: "low",
+        cemetery: "low",
+        station: "low",
+        metro: 'low',
+        unknown: "low"
+    };
+
+    const SEVERITY_COLORS = {
+        red: "#d32f2f",
+        yellow: "#f9a825",
+        green: "#2e7d32"
+    };
+
+    const SEVERITY_LABELS = {
+        red: "🔴 Может быть опасно",
+        yellow: "🟡 Обратите внимание",
+        green: "🟢 Всё хорошо, но имейте в виду"
+    };
+
+    function getSeverity(category, distance, radius) {
+        const risk = CATEGORY_RISK[category] || "low";
+        const ratio = distance / radius; // 0 = вплотную к объекту, 1 = на границе радиуса
+
+        if (risk === "high") {
+            if (ratio <= 0.5) return "red";
+            if (ratio <= 1.2) return "yellow";
+            return "green";
+        }
+
+        if (risk === "medium") {
+            if (ratio <= 0.3) return "red";
+            if (ratio <= 1) return "yellow";
+            return "green";
+        }
+
+        // low risk — красным никогда не подсвечиваем
+        return ratio <= 0.2 ? "yellow" : "green";
+    }
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap'
@@ -154,7 +204,6 @@ async function initGeoWidget() {
         });
 
         return layers.map(layer => {
-            let isDanger = false;
             let distance = null;
 
             // ТОЧКИ
@@ -168,7 +217,6 @@ async function initGeoWidget() {
                 );
 
                 distance = Math.round(dist);
-                isDanger = dist <= property.radius;
             }
 
             // ПОЛИГОНЫ
@@ -179,8 +227,6 @@ async function initGeoWidget() {
                 try {
                     let poly = turf.polygon([fixedCoords]);
                     poly = turf.rewind(poly, { mutate: true });
-
-                    isDanger = turf.booleanIntersects(poly, circle);
 
                     if (turf.booleanPointInPolygon(turf.point(propertyLngLat), poly)) {
                         distance = 0;
@@ -198,7 +244,6 @@ async function initGeoWidget() {
 
                 } catch (e) {
                     console.error(`Ошибка валидации полигона для "${layer.name}":`, e);
-                    isDanger = false;
                 }
             }
 
@@ -210,8 +255,6 @@ async function initGeoWidget() {
                 try {
                     const line = turf.lineString(invertedCoords);
 
-                    isDanger = turf.booleanIntersects(line, circle);
-
                     const snapped = turf.nearestPointOnLine(
                         line,
                         turf.point(propertyLngLat),
@@ -222,13 +265,12 @@ async function initGeoWidget() {
 
                 } catch (e) {
                     console.error(`Ошибка валидации линии для "${layer.name}":`, e);
-                    isDanger = false;
                 }
             }
 
             return {
                 ...layer,
-                isDanger,
+                severity: distance === null ? "green" : getSeverity(layer.category, distance, property.radius),
                 distance
             };
         });
@@ -276,14 +318,14 @@ async function initGeoWidget() {
             if (layer.type === "point") {
                 L.circleMarker(layer.coords, {
                     radius: 9,
-                    color: layer.isDanger ? "red" : "black",
-                    fillColor: layer.isDanger ? "red" : "black",
+                    color: SEVERITY_COLORS[layer.severity],
+                    fillColor: SEVERITY_COLORS[layer.severity],
                     fillOpacity: 0.4
                 })
                 .addTo(resultLayer)
                 .bindPopup(`
                     <strong>${layer.name}</strong><br>
-                    ${layer.isDanger ? "⚠ ОПАСНО" : "OK"}<br>
+                    ${SEVERITY_LABELS[layer.severity]}<br>
                     Расстояние: ${layer.distance} м
                 `);
             }
@@ -291,14 +333,14 @@ async function initGeoWidget() {
             // ПОЛИГОНЫ
             if (layer.type === "polygon") {
                 L.polygon(layer.coords, {
-                    color: layer.isDanger ? "red" : "black",
+                    color: SEVERITY_COLORS[layer.severity],
                     weight: 2,
-                    fillOpacity: layer.isDanger ? 0.4 : 0.15
+                    fillOpacity: 0.4
                 })
                 .addTo(resultLayer)
                 .bindPopup(`
                     <strong>${layer.name}</strong><br>
-                    ${layer.isDanger ? "⚠ ОПАСНО" : "OK"}<br>
+                    ${SEVERITY_LABELS[layer.severity]}<br>
                     Расстояние: ${layer.distance} м
                 `);
             }
@@ -306,13 +348,13 @@ async function initGeoWidget() {
             // ЛИНИИ
             if (layer.type === "line") {
                 L.polyline(layer.coords, {
-                    color: layer.isDanger ? "red" : "black",
-                    weight: layer.isDanger ? 4 : 2
+                    color: SEVERITY_COLORS[layer.severity],
+                    weight: 2
                 })
                 .addTo(resultLayer)
                 .bindPopup(`
                     <strong>${layer.name}</strong><br>
-                    ${layer.isDanger ? "⚠ ОПАСНО" : "OK"}<br>
+                    ${SEVERITY_LABELS[layer.severity]}<br>
                     Расстояние: ${layer.distance} м
                 `);
             }
@@ -329,40 +371,110 @@ async function initGeoWidget() {
             .join(", ");
     }
 
-    function renderAnalysisPanel(layers) {
+    function renderObjectsList(items) {
+        return items.map(layer => `
+            <div>
+                <strong>${layer.name}</strong><br>
+                Тип: ${formatCategories(layer.category)}<br>
+                Расстояние: ${layer.distance} м
+            </div>
+            <hr>
+        `).join("");
+    }
 
+    // function renderAnalysisPanel(layers) {
+    //     const panel = document.getElementById("analysis-content");
+    //     const inRadius = layers.filter(l => l.distance <= property.radius);
+
+    //     const bySeverity = {
+    //         red: inRadius.filter(l => l.severity === "red"),
+    //         yellow: inRadius.filter(l => l.severity === "yellow"),
+    //         green: inRadius.filter(l => l.severity === "green")
+    //     };
+
+    //     let html = "";
+
+    //     if (bySeverity.red.length > 0) {
+    //         html += `<h4 style="color:${SEVERITY_COLORS.red}">🔴 Опасно (${bySeverity.red.length})</h4>${renderObjectsList(bySeverity.red)}`;
+    //     }
+    //     if (bySeverity.yellow.length > 0) {
+    //         html += `<h4 style="color:${SEVERITY_COLORS.yellow}">🟡 Обратите внимание (${bySeverity.yellow.length})</h4>${renderObjectsList(bySeverity.yellow)}`;
+    //     }
+    //     if (bySeverity.green.length > 0) {
+    //         html += `<h4 style="color:${SEVERITY_COLORS.green}">🟢 Имейте в виду (${bySeverity.green.length})</h4>${renderObjectsList(bySeverity.green)}`;
+    //     }
+
+    //     panel.innerHTML = html || `<div class="safe">✔ В загруженной области объектов не найдено.</div>`;
+    // }
+
+    // сколько объектов показываем в каждой категории до кнопки "показать ещё"
+    const PANEL_PAGE_SIZE = 30;
+    const panelPageState = { red: PANEL_PAGE_SIZE, yellow: PANEL_PAGE_SIZE, green: PANEL_PAGE_SIZE };
+    const panelOpenState = { red: true, yellow: false, green: false };
+
+    function renderGroupItems(key, items) {
+        const visibleCount = panelPageState[key];
+        const visible = items.slice(0, visibleCount);
+        const hasMore = items.length > visibleCount;
+
+        const itemsHtml = visible.map(layer => `
+            <div class="panel-item">
+                <strong>${layer.name}</strong><br>
+                Тип: ${formatCategories(layer.category)}<br>
+                Расстояние: ${layer.distance} м
+            </div>
+        `).join("");
+
+        const moreButton = hasMore
+            ? `<button class="show-more-btn" onclick="window.__showMorePanel('${key}')">
+                Показать ещё (${items.length - visibleCount})
+            </button>`
+            : "";
+
+        return itemsHtml + moreButton;
+    }
+
+    function renderSeverityGroup(key, items, label, color) {
+        if (items.length === 0) return "";
+
+        const openAttr = panelOpenState[key] ? "open" : "";
+
+        return `
+            <details id="group-${key}" class="severity-group" ${openAttr} ontoggle="window.__onPanelToggle('${key}', this.open)">
+                <summary style="color:${color}">${label} (${items.length})</summary>
+                <div id="list-${key}" class="severity-list">${renderGroupItems(key, items)}</div>
+            </details>
+        `;
+    }
+
+    function renderAnalysisPanel(layers) {
         const panel = document.getElementById("analysis-content");
 
-        const dangerObjects = layers.filter(layer => layer.isDanger);
+        const inRadius = layers.filter(l => l.distance <= property.radius);
 
-        if (dangerObjects.length === 0) {
-            panel.innerHTML = `
-                <div class="safe">
-                    ✔ В выбранном радиусе опасных объектов не найдено.
-                </div>
-            `;
+        const bySeverity = {
+            red: inRadius.filter(l => l.severity === "red"),
+            yellow: inRadius.filter(l => l.severity === "yellow"),
+            green: inRadius.filter(l => l.severity === "green")
+        };
+
+        // сохраняем ссылку на текущий набор, чтобы "показать ещё" знал, что рисовать
+        window.__currentPanelData = bySeverity;
+
+        if (inRadius.length === 0) {
+            panel.innerHTML = `<div class="safe">✔ В выбранном радиусе объектов не найдено.</div>`;
             return;
         }
 
-        let html = `
-            <div class="warning">
-                ⚠ Найдено потенциально проблемных объектов: ${dangerObjects.length}
-            </div>
-        `;
-
-        dangerObjects.forEach(layer => {
-            html += `
-                <div>
-                    <strong>${layer.name}</strong><br>
-                    Тип: ${formatCategories(layer.category)}<br>
-                    Расстояние: ${layer.distance} м
-                </div>
-                <hr>
-            `;
-        });
-
-        panel.innerHTML = html;
+        panel.innerHTML =
+            renderSeverityGroup("red", bySeverity.red, "🔴 Опасно", SEVERITY_COLORS.red) +
+            renderSeverityGroup("yellow", bySeverity.yellow, "🟡 Обратите внимание", SEVERITY_COLORS.yellow) +
+            renderSeverityGroup("green", bySeverity.green, "🟢 Имейте в виду", SEVERITY_COLORS.green);
     }
+
+    window.__onPanelToggle = function(key, isOpen) {
+        panelOpenState[key] = isOpen;
+    };
 
     // ЗАПУСК
     drawBaseLayers(problemLayers);
@@ -371,6 +483,19 @@ async function initGeoWidget() {
     console.log("RESULT:", analyzed);
 
     renderResults(analyzed);
+
+    window.__showMorePanel = function(key) {
+        panelPageState[key] += PANEL_PAGE_SIZE;
+        panelOpenState[key] = true;
+
+        const items = window.__currentPanelData[key];
+        const listEl = document.getElementById(`list-${key}`);
+
+        if (listEl) {
+            listEl.innerHTML = renderGroupItems(key, items);
+        }
+    };
+
     renderAnalysisPanel(analyzed);
 
     // ИЗМЕНЕНИЕ РАДИУСА
@@ -394,6 +519,7 @@ async function initGeoWidget() {
         const analyzed = analyze(property, problemLayers);
 
         renderResults(analyzed);
+        panelPageState.red = panelPageState.yellow = panelPageState.green = PANEL_PAGE_SIZE;
         renderAnalysisPanel(analyzed);
     });
 }

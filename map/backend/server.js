@@ -1,12 +1,8 @@
-// server.js
-// Backend для гео-виджета: принимает адрес, геокодирует его (Nominatim),
+
+// Принимает адрес, геокодирует его (Nominatim),
 // запрашивает проблемные объекты вокруг точки (Overpass API) и отдаёт
 // фронтенду единый JSON в формате { property, problemLayers }.
-//
-// Зачем нужен backend, а не прямые запросы с фронта:
-//  - у Nominatim и Overpass жёсткие правила по User-Agent и нагрузке
-//  - легко закэшировать повторные запросы по одному и тому же адресу
-//  - не упираемся в CORS/лимиты браузера
+
 
 const express = require("express");
 const cors = require("cors");
@@ -16,18 +12,13 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
-// Максимальный радиус, на который грузим объекты за один запрос.
-// Слайдер на фронте дальше просто фильтрует уже загруженные
-// данные без повторных обращений к Overpass.
-// 2500 м подобрано опытным путём: 5000 м слишком нагружает публичный
-// Overpass для регионов подальше от основных дата-центров (Владивосток,
-// СПб) и запрос стабильно улетает в таймаут.
+// Максимальный радиус, на который грузим объекты за один запрос
 const MAX_RADIUS_M = 2500;
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 
-// Публичный overpass-api.de часто перегружен и отдаёт 504.
-// Пробуем несколько зеркал по очереди, пока одно не ответит.
+// Публичный overpass-api.de часто перегружен и отдаёт 504
+// Пробуем несколько зеркал по очереди, пока одно не ответит
 const OVERPASS_URLS = [
     "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
@@ -39,7 +30,7 @@ const HEADERS = {
     "User-Agent": "gis-risk-widget-mvp/1.0 (student project, contact: none)"
 };
 
-// Простой in-memory кэш, чтобы не долбить Overpass повторно по тому же адресу
+// Простой in-memory кэш
 const cache = new Map();
 const CACHE_TTL_MS = 10 * 60 * 1000; // 10 минут
 
@@ -57,8 +48,7 @@ function setCache(key, data) {
     cache.set(key, { data, time: Date.now() });
 }
 
-// ---------- ГЕОКОДИРОВАНИЕ ----------
-
+// ГЕОКОДИРОВАНИЕ
 async function geocodeAddress(address) {
     const url = `${NOMINATIM_URL}?format=json&countrycodes=ru&q=${encodeURIComponent(address)}`;
 
@@ -75,8 +65,7 @@ async function geocodeAddress(address) {
     return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
 }
 
-// ---------- OVERPASS ----------
-
+// OVERPASS
 function buildOverpassQuery(lat, lon, radius) {
     // around:radius,lat,lon — геопоиск в радиусе (в метрах) от точки
     return `
@@ -129,12 +118,6 @@ async function fetchProblemObjects(lat, lon, radius) {
 
     let lastError;
 
-    // Пробуем зеркала по очереди: публичный Overpass нестабилен и часто
-    // отдаёт 504 под нагрузкой, поэтому не полагаемся на один инстанс.
-    // ВАЖНО: внешний таймаут должен быть БОЛЬШЕ внутреннего [timeout:25]
-    // в самом Overpass-запросе — иначе мы сами обрываем соединение раньше,
-    // чем Overpass успевает честно досчитать и вернуть ответ (именно это
-    // происходило для городов подальше от основных дата-центров Overpass).
     for (const url of OVERPASS_URLS) {
         for (let attempt = 1; attempt <= 2; attempt++) {
             try {
@@ -149,7 +132,7 @@ async function fetchProblemObjects(lat, lon, radius) {
     throw new Error(`все зеркала Overpass недоступны (последняя ошибка: ${lastError.message})`);
 }
 
-// ---------- КОНВЕРТЕР Overpass -> формат виджета ----------
+// Overpass -> формат виджета
 
 const CATEGORY_LABELS = {
     industry_zone: "Промышленная зона",
@@ -161,6 +144,8 @@ const CATEGORY_LABELS = {
     station: "Вокзал / ж-д станция",
     cemetery: "Кладбище",
     depot: "Депо / ж-д парк",
+    metro: "Станция метро",
+    metro_line: "Линия метро",
 };
 
 function detectCategory(tags) {
@@ -170,6 +155,7 @@ function detectCategory(tags) {
     // важно проверить railway=station ДО общей проверки на railway,
     // иначе вокзалы попадут в категорию "железная дорога"
     if (tags.railway === "depot" || tags.landuse === "railway") return "depot";
+    if (tags.railway === "station" && tags.station === "subway") return "metro";
     if (tags.railway === "station") return "station";
     if (tags.railway) return "railway";
     if (tags.highway) return "road";
@@ -180,7 +166,7 @@ function detectCategory(tags) {
 
 // Линии (ж/д пути, трассы) — открытая геометрия.
 // Всё остальное (промзоны, ТБО, с/х, аэропорты, вокзалы, кладбища) —
-// площадные объекты (полигоны) либо точки, если так замаплено в OSM.
+// площадные объекты (полигоны) либо точки, если так в OSM.
 function isLineCategory(category) {
     return category === "railway" || category === "road";
 }
@@ -223,8 +209,6 @@ function convertOverpassElements(elements) {
         .map(convertElement)
         .filter(Boolean);
 }
-
-// ---------- РОУТ ----------
 
 app.get("/api/geo-data", async (req, res) => {
     const address = req.query.address;
