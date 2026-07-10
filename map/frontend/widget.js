@@ -90,6 +90,7 @@ async function initGeoWidget() {
         depot: "🚉 Депо / электродепо",
         metro: "🚇 Станция метро",
         metro_line: "🚇 Линия метро",
+        mfc: "📄 МФЦ (Мои документы)",
         unknown: "❔ Прочий объект"
     };
 
@@ -112,19 +113,22 @@ async function initGeoWidget() {
     const SEVERITY_COLORS = {
         red: "#d32f2f",
         yellow: "#f9a825",
-        green: "#2e7d32"
+        green: "#2e7d32",
+        neutral: "#1565c0"
     };
 
     const SEVERITY_LABELS = {
         red: "🔴 Может быть опасно",
         yellow: "🟡 Обратите внимание",
-        green: "🟢 Всё хорошо, но имейте в виду"
+        green: "🟢 Всё хорошо, но имейте в виду",
+        neutral: "Полезный объект поблизости"
     };
 
     function getSeverity(category, distance, radius) {
         const risk = CATEGORY_RISK[category] || "low";
         const ratio = distance / radius; // 0 = вплотную к объекту, 1 = на границе радиуса
 
+        if (category === "mfc") return "neutral";
         if (risk === "high") {
             if (ratio <= 0.5) return "red";
             if (ratio <= 1.2) return "yellow";
@@ -382,31 +386,6 @@ async function initGeoWidget() {
         `).join("");
     }
 
-    // function renderAnalysisPanel(layers) {
-    //     const panel = document.getElementById("analysis-content");
-    //     const inRadius = layers.filter(l => l.distance <= property.radius);
-
-    //     const bySeverity = {
-    //         red: inRadius.filter(l => l.severity === "red"),
-    //         yellow: inRadius.filter(l => l.severity === "yellow"),
-    //         green: inRadius.filter(l => l.severity === "green")
-    //     };
-
-    //     let html = "";
-
-    //     if (bySeverity.red.length > 0) {
-    //         html += `<h4 style="color:${SEVERITY_COLORS.red}">🔴 Опасно (${bySeverity.red.length})</h4>${renderObjectsList(bySeverity.red)}`;
-    //     }
-    //     if (bySeverity.yellow.length > 0) {
-    //         html += `<h4 style="color:${SEVERITY_COLORS.yellow}">🟡 Обратите внимание (${bySeverity.yellow.length})</h4>${renderObjectsList(bySeverity.yellow)}`;
-    //     }
-    //     if (bySeverity.green.length > 0) {
-    //         html += `<h4 style="color:${SEVERITY_COLORS.green}">🟢 Имейте в виду (${bySeverity.green.length})</h4>${renderObjectsList(bySeverity.green)}`;
-    //     }
-
-    //     panel.innerHTML = html || `<div class="safe">✔ В загруженной области объектов не найдено.</div>`;
-    // }
-
     // сколько объектов показываем в каждой категории до кнопки "показать ещё"
     const PANEL_PAGE_SIZE = 30;
     const panelPageState = { red: PANEL_PAGE_SIZE, yellow: PANEL_PAGE_SIZE, green: PANEL_PAGE_SIZE };
@@ -447,6 +426,48 @@ async function initGeoWidget() {
         `;
     }
 
+    function getPluralForm(n) {
+        const mod10 = n % 10;
+        const mod100 = n % 100;
+        if (mod100 >= 11 && mod100 <= 14) return 2;
+        if (mod10 === 1) return 0;
+        if (mod10 >= 2 && mod10 <= 4) return 1;
+        return 2;
+    }
+
+    const RED_FORMS = [
+        "потенциально опасный объект",
+        "потенциально опасных объекта",
+        "потенциально опасных объектов"
+    ];
+
+    const YELLOW_FORMS = [
+        "объект, на который стоит обратить внимание",
+        "объекта, на которые стоит обратить внимание",
+        "объектов, на которые стоит обратить внимание"
+    ];
+
+    const GREEN_FORMS = [
+        "объект, который может быть полезен и опасности не представляет",
+        "объекта, которые могут быть полезны и опасности не представляют",
+        "объектов, которые могут быть полезны и опасности не представляют"
+    ];
+
+    function renderSummaryText(counts) {
+        const redPhrase = RED_FORMS[getPluralForm(counts.red)];
+        const yellowPhrase = YELLOW_FORMS[getPluralForm(counts.yellow)];
+        const greenPhrase = GREEN_FORMS[getPluralForm(counts.green)];
+
+        return `
+            <div class="analysis-summary">
+                В выбранном радиусе обнаружено:<br>
+                <b style="color:${SEVERITY_COLORS.red}">${counts.red} ${redPhrase}</b>,<br>
+                <b style="color:${SEVERITY_COLORS.yellow}">${counts.yellow} ${yellowPhrase}</b>,<br>
+                <b style="color:${SEVERITY_COLORS.green}">${counts.green} ${greenPhrase}</b>.
+            </div>
+        `;
+    }
+
     function renderAnalysisPanel(layers) {
         const panel = document.getElementById("analysis-content");
 
@@ -467,6 +488,11 @@ async function initGeoWidget() {
         }
 
         panel.innerHTML =
+            renderSummaryText({
+                red: bySeverity.red.length,
+                yellow: bySeverity.yellow.length,
+                green: bySeverity.green.length
+            }) +
             renderSeverityGroup("red", bySeverity.red, "🔴 Опасно", SEVERITY_COLORS.red) +
             renderSeverityGroup("yellow", bySeverity.yellow, "🟡 Обратите внимание", SEVERITY_COLORS.yellow) +
             renderSeverityGroup("green", bySeverity.green, "🟢 Имейте в виду", SEVERITY_COLORS.green);
@@ -522,6 +548,7 @@ async function initGeoWidget() {
         panelPageState.red = panelPageState.yellow = panelPageState.green = PANEL_PAGE_SIZE;
         renderAnalysisPanel(analyzed);
     });
+
 }
 
 // старт

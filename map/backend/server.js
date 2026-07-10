@@ -86,6 +86,12 @@ function buildOverpassQuery(lat, lon, radius) {
         `;
 }
 
+// МФЦ
+// way["government"="multifunctional_centre"](around:${radius},${lat},${lon});
+// node["government"="multifunctional_centre"](around:${radius},${lat},${lon});
+// way["office"="government"](around:${radius},${lat},${lon});
+// node["office"="government"](around:${radius},${lat},${lon});
+
 async function tryOverpassUrl(url, query, timeoutMs) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -106,6 +112,12 @@ async function tryOverpassUrl(url, query, timeoutMs) {
         }
 
         const data = await response.json();
+
+        if (data.remark) {
+            console.warn("Overpass remark (вероятная ошибка в запросе):", data.remark);
+        }
+        console.log(`Overpass вернул элементов: ${(data.elements || []).length}`);
+
         return data.elements || [];
 
     } finally {
@@ -146,6 +158,7 @@ const CATEGORY_LABELS = {
     depot: "Депо / ж-д парк",
     metro: "Станция метро",
     metro_line: "Линия метро",
+    mfc: "МФЦ",
 };
 
 function detectCategory(tags) {
@@ -161,6 +174,8 @@ function detectCategory(tags) {
     if (tags.highway) return "road";
     if (tags.landuse === "farmland" || tags.landuse === "farmyard") return "agriculture";
     if (tags.landuse === "cemetery" || tags.amenity === "grave_yard") return "cemetery";
+    if (tags.government === "multifunctional_centre") return "mfc";
+    if (tags.office === "government" && /мфц|мои документы/i.test(tags.name || "")) return "mfc";
     return "unknown";
 }
 
