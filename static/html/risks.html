@@ -272,7 +272,15 @@
         <h4>Поиск по статьям, документам и вопросам</h4>
 
         <div class="search-wrapper">
-          <input class="search-input" type="text" placeholder="Покупка квартиры">
+          <input
+            class="search-input"
+            type="text"
+            placeholder="Покупка квартиры"
+            data-search-input
+            data-results="#searchResults"
+          >
+
+         <div class="search-results" id="searchResults"></div>
         </div>
       </section>
 
@@ -294,9 +302,10 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase-client.js"></script>
+<script src="../js/content-api.js"></script>
+<script src="../js/search.js"></script>
 <script src="../js/risks.js"></script>
-<script src="../js/database.js"></script>
-
 </body>
 </html>
 
