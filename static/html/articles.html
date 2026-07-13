@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Статьи — Сервис анализа рисков</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/article_main.css" />
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">Логотип</div>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="/index.html">Главная</a></li>
+                <li><a href="articles.html" class="active">Статьи</a></li>
+                <li><a href="/index.html#templatesSection">Шаблоны документов</a></li>
+                <li><a href="/index.html#storiesSection">Истории из жизни</a></li>
+                <li><a href="/index.html#faqSection">Вопросы и ответы</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="article-page">
+        <section class="article-layout">
+            <div class="article-left">
+
+                <section class="article-hero">
+                    <h1>Статьи</h1>
+                    <p class="article-subtext">Полезные материалы по покупке недвижимости</p>
+                </section>
+
+                <div class="articles-grid">
+                    <a href="article_1.html" class="article-card">
+                        <div class="article-card-content">
+                            <h3 class="article-title">Заверения об обстоятельствах (ст. 431.2 ГК РФ): что это такое и в чем их польза при покупке недвижимости и не только</h3>
+                            <div class="article-meta">
+                                <span class="article-read">Читать →</span>
+                            </div>
+                        </div>
+                    </a>
+                    <a href="article_4.html" class="article-card">
+                        <div class="article-card-content">
+                            <h3 class="article-title">Способы обеспечения исполнения обязательств как дополнительная защита покупателя недвижимости при оспаривании сделки</h3>
+                            <div class="article-meta">
+                                <span class="article-read">Читать →</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="article_2.html" class="article-card">
+                        <div class="article-card-content">
+                            <h3 class="article-title">Защита покупателя при оспаривании сделки купли-продажи недвижимости: анализ ст. 177, 178, 179 ГК РФ, возможные риски и рекомендации по их предупреждению.</h3>
+                            <div class="article-meta">
+                                <span class="article-read">Читать →</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="article_3.html" class="article-card">
+                        <div class="article-card-content">
+                            <h3 class="article-title">Покупка недвижимости у продавца с долгами (банкрота): какие есть риски</h3>
+                            <div class="article-meta">
+                                <span class="article-read">Читать →</span>
+                            </div>
+                        </div>
+                    </a>
+
+                    
+                </div>
+
+            </div>
+
+            <aside class="article-sidebar">
+                <section class="article-search">
+                    <h4>Поиск по статьям, документам и вопросам</h4>
+                    <div class="search-wrapper">
+                        <input class="search-input" type="text" placeholder="Покупка квартиры" data-search-input data-results="#searchResults">
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
+                </section>
+
+                <section class="article-start-card">
+                    <h3>С чего начать покупку?</h3>
+                    <a href="start-guide.html" class="instruction-btn">Открыть инструкцию →</a>
+                </section>
+
+                <section class="article-materials">
+                    <h2>Полезные материалы</h2>
+                    <ul class="nav-list">
+                        <li><a href="#">Региональные особенности →</a></li>
+                        <li><a href="#">Как проверить риелтора →</a></li>
+                    </ul>
+                </section>
+            </aside>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../js/supabase-client.js"></script>
+    <script src="../js/content-api.js"></script>
+    <script src="../js/search.js"></script>
+</body>
+</html>

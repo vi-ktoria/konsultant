@@ -12,9 +12,8 @@
 //      было в исходной версии — там они были искусственно "замкнуты" в
 //      полигон в problems.json.
 
-// Адрес backend'а. Если разворачиваете backend на другом хосте/порту —
-// поменяйте здесь.
-const BACKEND_URL = "http://localhost:3000";
+// Адрес backend. Если разворачиваете backend на другом хосте/порту - поменяйте здесь.
+const BACKEND_URL = "https://konsultant-map-backend.onrender.com";
 
 // вспомогательные функции
 
