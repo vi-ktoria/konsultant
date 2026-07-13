@@ -1,0 +1,511 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background-color: #C8D3EA;
+  color: #1a3a4a;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 32px;
+  background-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  margin-right: 100px;
+  list-style: none;
+}
+
+.nav-links a {
+  color: #1a3a4a;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  color: #2563EB;
+}
+
+main,
+.risks-page {
+  width: 100%;
+  padding: 40px 32px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: #1a3a4a;
+  font-weight: 600;
+}
+
+h1 {
+  max-width: 900px;
+  margin-bottom: 12px;
+  font-size: clamp(30px, 3vw, 40px);
+  line-height: 1.15;
+}
+
+.risks-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 48px;
+  width: 100%;
+}
+
+.risks-left {
+  flex: 1;
+  max-width: 850px;
+  margin-left: 30px;
+  padding-right: 24px;
+}
+
+.risks-right {
+  width: 25%;
+  max-width: 25%;
+  margin-left: auto;
+  margin-right: 80px;
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 60px;
+}
+
+.risks-hero {
+  margin-bottom: 28px;
+}
+
+.risks-subtext {
+  max-width: 760px;
+  color: #1a3a4a;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.risks-text {
+  padding: 28px 32px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.55);
+  color: #1a3a4a;
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: auto;
+}
+
+.risks-text h3 {
+  margin: 34px 0 14px;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.risks-text h3:first-child {
+  margin-top: 0;
+}
+
+.risks-text h4 {
+  margin: 26px 0 12px;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+.risks-text p {
+  margin-bottom: 14px;
+}
+
+.risks-text ul,
+.risks-text ol {
+  margin: 10px 0 18px;
+  padding-left: 24px;
+}
+
+.risks-text li {
+  margin-bottom: 8px;
+}
+
+.risks-table {
+  min-width: 560px;
+  width: 100%;
+  margin: 22px 0 26px;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.5);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.risks-table th,
+.risks-table td {
+  padding: 14px 16px;
+  border: 1px solid rgba(26, 58, 74, 0.18);
+  text-align: left;
+  vertical-align: top;
+}
+
+.risks-table th {
+  background-color: rgba(255, 255, 255, 0.55);
+  font-weight: 600;
+}
+
+.search-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.7);
+  font-size: 16px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.risks-search,
+.risks-materials {
+  padding: 0;
+  border: none;
+  background: none;
+}
+
+.risks-search h4 {
+  margin-bottom: 18px;
+  color: #1a3a4a;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.risks-start-card {
+  padding: 20px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.6);
+  color: #1a3a4a;
+}
+
+.risks-start-card h3 {
+  margin-bottom: 18px;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.instruction-btn {
+  display: inline-block;
+  padding: 10px 28px 10px 24px;
+  border: none;
+  border-radius: 10px;
+  background-color: #2563EB;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.instruction-btn:hover {
+  background-color: #1D4ED8;
+}
+
+.risks-materials h2 {
+  margin-bottom: 16px;
+  color: #1a3a4a;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+}
+
+.nav-list a {
+  display: block;
+  padding: 6px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #1a3a4a;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.nav-list a:hover {
+  color: #2563EB;
+}
+
+@media (max-width: 1024px) {
+  .nav-links {
+    gap: 24px;
+    margin-right: 0;
+  }
+
+  .risks-layout {
+    gap: 32px;
+  }
+
+  .risks-left {
+    max-width: none;
+    margin-left: 0;
+  }
+
+  .risks-right {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  main,
+  .risks-page {
+    padding: 32px 20px;
+  }
+
+  .navbar {
+    align-items: flex-start;
+    gap: 16px;
+    padding: 14px 20px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    gap: 14px 20px;
+  }
+
+  .risks-layout {
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .risks-left,
+  .risks-right {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .risks-right {
+    gap: 24px;
+  }
+
+  .risks-text {
+    padding: 22px 20px;
+    font-size: 15px;
+  }
+
+  .risks-text h3 {
+    font-size: 22px;
+  }
+
+  .risks-text h4 {
+    font-size: 18px;
+  }
+}
+
+/* Блок содержания статьи */
+.article-contents {
+  margin-bottom: 24px;
+  padding: 24px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.55);
+  color: #1a3a4a;
+}
+
+.article-contents h2 {
+  margin-bottom: 16px;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.article-contents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.article-contents-link {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: #1a3a4a;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-decoration: none;
+}
+
+.article-contents-link:hover {
+  color: #2563EB;
+}
+
+#article-abbreviations,
+#article-meaning,
+#article-risks,
+#article-checks {
+  scroll-margin-top: 95px;
+}
+
+@media (max-width: 768px) {
+  .article-contents {
+    padding: 22px 20px;
+  }
+
+  .article-contents h2 {
+    font-size: 22px;
+  }
+
+  .article-contents-link {
+    width: 100%;
+  }
+}
+.article-hero {
+  margin-bottom: 28px;
+}
+
+.article-hero h1 {
+  margin-bottom: 16px;
+  font-size: 34px;
+  line-height: 1.25;
+  color: #0f3446;
+}
+
+.article-hero p {
+  font-size: 18px;
+  line-height: 1.5;
+  color: #0f3446;
+}
+
+.article-contents {
+  margin-bottom: 28px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.55);
+  color: #0f3446;
+}
+
+.article-contents h2 {
+  margin-bottom: 16px;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.article-contents-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.article-contents-link {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.75);
+  color: #0f3446;
+  font-size: 16px;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.article-contents-link:hover {
+  color: #2563eb;
+}
+
+.article-section {
+  padding: 24px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.55);
+  color: #0f3446;
+}
+
+.article-section h2 {
+  margin-top: 28px;
+  margin-bottom: 16px;
+  font-size: 26px;
+  line-height: 1.3;
+}
+
+.article-section h2:first-child {
+  margin-top: 0;
+}
+
+.article-section h3 {
+  margin-top: 22px;
+  margin-bottom: 12px;
+  font-size: 21px;
+  line-height: 1.3;
+}
+
+.article-section p {
+  margin-bottom: 14px;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.article-section ul,
+.article-section ol {
+  margin: 0 0 16px 24px;
+  padding: 0;
+}
+
+.article-section li {
+  margin-bottom: 8px;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.article-section table {
+  width: 100%;
+  margin: 20px 0;
+  border-collapse: collapse;
+  background-color: rgba(255, 255, 255, 0.75);
+}
+
+.article-section th,
+.article-section td {
+  padding: 12px;
+  border: 1px solid rgba(15, 52, 70, 0.18);
+  text-align: left;
+  vertical-align: top;
+}
+
+.article-section th {
+  font-weight: 700;
+}
