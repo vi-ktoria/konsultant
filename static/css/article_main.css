@@ -193,6 +193,99 @@
     color: #1a3a4a;
 }
 
+/* ===== Карточки рисков (аккордеон) ===== */
+.article-card {
+    display: block;
+    margin-bottom: 16px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    background-color: rgba(255, 255, 255, 0.55);
+    overflow: hidden;
+    transition: background-color 0.2s ease;
+}
+
+.article-card:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+}
+
+.article-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a3a4a;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.article-card-title::-webkit-details-marker {
+    display: none;
+}
+
+.article-card-title .article-arrow {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+}
+
+.article-card[open] .article-card-title .article-arrow {
+    transform: rotate(180deg);
+}
+
+.article-card-content {
+    padding: 0 24px 24px 24px;
+    color: #1a3a4a;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.article-card-content h4 {
+    margin: 20px 0 10px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a3a4a;
+}
+
+.article-card-content h4:first-child {
+    margin-top: 0;
+}
+
+.article-card-content p {
+    margin-bottom: 14px;
+}
+
+.article-card-content ul,
+.article-card-content ol {
+    margin: 10px 0 18px;
+    padding-left: 24px;
+}
+
+.article-card-content li {
+    margin-bottom: 8px;
+}
+
+.article-card-content li p {
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.article-card-content a {
+    display: inline-block;
+    margin-top: 8px;
+    color: #2563EB;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.article-card-content a:hover {
+    color: #1D4ED8;
+    text-decoration: underline;
+}
+
 @media (max-width: 1024px) {
     .article-layout {
         gap: 32px;
