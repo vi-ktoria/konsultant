@@ -1,4 +1,4 @@
-const ARTICLE_SLUG = 'suprug-mozhet-byt-ne-soglasen-s-prodazhey-nedvizhimosti';
+const ARTICLE_SLUG = 'riski-pri-pokupke-nedvizhimosti-priobretennoy-s-ispolzovaniem-sredstv-materinskogo-kapitala';
 
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
