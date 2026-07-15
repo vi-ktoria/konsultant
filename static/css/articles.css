@@ -399,3 +399,20 @@ h1 {
     font-size: 16px;
   }
 }
+#articleContent aside {
+    margin: 24px 0;
+    padding: 18px 20px;
+    border-left: 4px solid #4f81bd;
+    border-radius: 8px;
+    background: #eef5fc;
+}
+
+#articleContent aside p {
+    margin: 0;
+    color: #315f91;
+    line-height: 1.6;
+}
+
+#articleContent aside strong {
+    font-weight: 700;
+}

@@ -1,4 +1,4 @@
-const ARTICLE_SLUG = 'poryadok-priobreteniya-nedvizhimosti';
+const ARTICLE_SLUG = 'poshagovaya-instruktsiya-po-priobreteniyu-nedvizhimosti';
 
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
