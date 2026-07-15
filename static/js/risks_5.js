@@ -1,4 +1,4 @@
-const ARTICLE_SLUG = 'prodazha-nedvizhimosti-cherez-predstavitelya-po-doverennosti-osnovnye-riski-i-sposoby-ih-predotvrashcheniya';
+const ARTICLE_SLUG = 'riski-pri-pokupke-kvartiry-poluchennoy-v-nasledstvo-skrytye-nasledniki-osparivanie-sdelok-i-zashchita-pokupatelya';
 
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');

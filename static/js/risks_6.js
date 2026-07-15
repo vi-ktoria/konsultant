@@ -1,4 +1,4 @@
-const ARTICLE_SLUG = 'prodazha-nedvizhimosti-cherez-predstavitelya-po-doverennosti-osnovnye-riski-i-sposoby-ih-predotvrashcheniya';
+const ARTICLE_SLUG = 'pokupka-nedvizhimosti-u-prodavtsa-s-dolgami-bankrota-kakie-est-riski';
 
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
