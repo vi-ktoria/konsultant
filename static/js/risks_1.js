@@ -1,4 +1,4 @@
-const ARTICLE_SLUG = 'privatizaciya-zhilya-bez-oshibok';
+const ARTICLE_SLUG = 'zashchita-pokupatelya-pri-osparivanii-sdelki-kupli-prodazhi-nedvizhimosti-st-177-178-179-gk-rf';
 
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
