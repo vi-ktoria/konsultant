@@ -85,3 +85,83 @@ document.addEventListener('DOMContentLoaded', function () {
 
     loadFaq();
 });
+function getTermPopupOverlay() {
+    let overlay = document.querySelector('.term-popup-overlay');
+
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'term-popup-overlay';
+        overlay.hidden = true;
+
+        document.body.appendChild(overlay);
+    }
+
+    return overlay;
+}
+
+function closeTermPopup() {
+    document
+        .querySelectorAll('.term-popup:not([hidden])')
+        .forEach(function (popup) {
+            popup.hidden = true;
+        });
+
+    document
+        .querySelectorAll('.term-explanation[aria-expanded="true"]')
+        .forEach(function (button) {
+            button.setAttribute('aria-expanded', 'false');
+        });
+
+    const overlay = document.querySelector('.term-popup-overlay');
+
+    if (overlay) {
+        overlay.hidden = true;
+    }
+
+    document.body.classList.remove('term-popup-open');
+}
+
+document.addEventListener('click', function (event) {
+    const termButton = event.target.closest('.term-explanation');
+
+    if (termButton) {
+        const popupId = termButton.dataset.popup;
+        const popup = document.getElementById(popupId);
+
+        if (!popup) {
+            console.error(`Не найден блок с id="${popupId}".`);
+            return;
+        }
+
+        closeTermPopup();
+
+        /*
+         * Переносим карточку в body, чтобы она не обрезалась
+         * границами блока FAQ.
+         */
+        document.body.appendChild(popup);
+
+        const overlay = getTermPopupOverlay();
+
+        popup.hidden = false;
+        overlay.hidden = false;
+
+        termButton.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('term-popup-open');
+
+        return;
+    }
+
+    const closeButton = event.target.closest('.term-popup-close');
+    const overlay = event.target.closest('.term-popup-overlay');
+
+    if (closeButton || overlay) {
+        closeTermPopup();
+    }
+});
+
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') {
+        closeTermPopup();
+    }
+});
