@@ -1,4 +1,4 @@
-const ARTICLE_SLUG = 'zavereniya-ob-obstoyatelstvah-st-431-2-gk-rf-chto-eto-takoe-i-v-chem-ih-polza-pri-pokupke-nedvizhimosti-i-ne-tolko';
+const ARTICLE_SLUG = 'zavereniya-ob-obstoyatelstvah-chto-eto-takoe-v-chem-ih-polza-pri-pokupke-nedvizhimosti-i-ne-tolko';
 
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');

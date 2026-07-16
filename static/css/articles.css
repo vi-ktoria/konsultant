@@ -416,3 +416,6 @@ h1 {
 #articleContent aside strong {
     font-weight: 700;
 }
+#articleIntro {
+    margin-bottom: 28px;
+}
