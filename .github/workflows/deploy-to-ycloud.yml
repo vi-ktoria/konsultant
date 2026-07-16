@@ -12,10 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install AWS CLI
+      - name: Install AWS CLI via pip
         run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
+          pip install awscli --upgrade --user
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Sync to Yandex Cloud
         env:
