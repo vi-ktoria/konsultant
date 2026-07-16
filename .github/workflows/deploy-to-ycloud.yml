@@ -1,36 +1,35 @@
-name: Deploy to Yandex Cloud Object Storage
+name: Deploy to Yandex Cloud
 
 on:
   push:
     branches:
-      - main  # Или ваша основная ветка, например, master
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy static files to Yandex Cloud
-        uses: sergeevpasha/yandex-cloud-s3-sync-github-actions@v0.1.0
-        with:
-          YANDEX_CLOUD_ACCESS_KEY_ID: ${{ secrets.YANDEX_CLOUD_ACCESS_KEY_ID }}
-          YANDEX_CLOUD_SECRET_ACCESS_KEY: ${{ secrets.YANDEX_CLOUD_SECRET_ACCESS_KEY }}
-          YANDEX_CLOUD_BUCKET_NAME: ${{ secrets.YANDEX_CLOUD_BUCKET_NAME }}
-          PATH: "./"          # Путь к папке с вашими HTML/CSS/JS файлами
-          CLEAR: true         # Опционально: очищает бакет перед загрузкой
+      - name: Install AWS CLI
+        run: |
+          apt-get update
+          apt-get install -y awscli
 
       - name: Sync to Yandex Cloud
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.YANDEX_CLOUD_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.YANDEX_CLOUD_SECRET_ACCESS_KEY }}
         run: |
-          aws s3 sync ./ s3://${{ secrets.YANDEX_CLOUD_BUCKET_NAME }} \
+          aws s3 sync ./static/ s3://${{ secrets.YANDEX_CLOUD_BUCKET_NAME }}/static/ \
             --endpoint-url https://storage.yandexcloud.net \
-            --access-key-id ${{ secrets.YANDEX_CLOUD_ACCESS_KEY_ID }} \
-            --secret-access-key ${{ secrets.YANDEX_CLOUD_SECRET_ACCESS_KEY }} \
-            --delete \
-            --content-type "text/html" \
-            --exclude "*.css" \
-            --exclude "*.js" \
-            --exclude "*.png" \
-            --exclude "*.jpg" \
-            --exclude "*.svg"
+            --delete
+
+          aws s3 sync ./map/ s3://${{ secrets.YANDEX_CLOUD_BUCKET_NAME }}/map/ \
+            --endpoint-url https://storage.yandexcloud.net \
+            --delete
+
+          aws s3 cp ./index.html s3://${{ secrets.YANDEX_CLOUD_BUCKET_NAME }}/index.html \
+            --endpoint-url https://storage.yandexcloud.net \
+            --content-type "text/html"
