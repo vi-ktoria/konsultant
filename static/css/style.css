@@ -367,12 +367,7 @@ h5 {
 .story-card:hover {
     background-color: rgba(255, 255, 255, 0.7);
 }
-.story-card:not(:first-child) {
-    cursor: default;
-}
-.story-card:not(:first-child):hover {
-    background-color: rgba(255, 255, 255, 0.5);
-}
+
 .story-preview {
     padding: 20px 24px;
     height: 100%;
