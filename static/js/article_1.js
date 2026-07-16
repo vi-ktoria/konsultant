@@ -1,5 +1,5 @@
-const ARTICLE_SLUG = 'zavereniya-ob-obstoyatelstvah-chto-eto-takoe-v-chem-ih-polza-pri-pokupke-nedvizhimosti-i-ne-tolko';
-
+const params = new URLSearchParams(window.location.search);
+const ARTICLE_SLUG = params.get('slug');
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
   const contentsContainer = document.getElementById('articleContents');
@@ -44,7 +44,16 @@ const contentElement = document.getElementById('articleContent');
   if (!titleElement || !descriptionElement || !introElement || !contentElement) {
     console.error('На странице нет нужных блоков для вывода статьи.');
     return;
-}
+  }
+  if (!ARTICLE_SLUG) {
+        titleElement.textContent = 'Статья не выбрана';
+        descriptionElement.textContent = '';
+        introElement.innerHTML = '';
+        contentElement.innerHTML =
+            '<p>Вернитесь к списку статей и выберите материал.</p>';
+        return;
+    }
+
 
   const { data, error } = await supabaseClient
     .from('content_items')
