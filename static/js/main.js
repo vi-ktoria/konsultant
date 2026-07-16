@@ -196,5 +196,6 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(updateTemplatesButtons, 100);
     }
 
+    storiesLoaded.then(function () {
     renderStories();
 });
