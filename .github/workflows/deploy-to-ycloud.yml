@@ -12,24 +12,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Этот шаг нужен, если вашему проекту требуется сборка, например, для React/Vue.
-      # Если вы загружаете готовые HTML/JS файлы, этот блок можно пропустить.
-      # - name: Install dependencies
-      #   run: npm ci
-      #
-      # - name: Build project
-      #   run: npm run build
-      #
-      # - name: Deploy to Yandex Cloud
-      #   uses: sergeevpasha/yandex-cloud-s3-sync-github-actions@v0.1.0
-      #   with:
-      #     YANDEX_CLOUD_ACCESS_KEY_ID: ${{ secrets.YANDEX_CLOUD_ACCESS_KEY_ID }}
-      #     YANDEX_CLOUD_SECRET_ACCESS_KEY: ${{ secrets.YANDEX_CLOUD_SECRET_ACCESS_KEY }}
-      #     YANDEX_CLOUD_BUCKET_NAME: ${{ secrets.YANDEX_CLOUD_BUCKET_NAME }}
-      #     PATH: "./dist"  # Путь к папке со сборкой
-      #     CLEAR: true     # Очистить бакет перед загрузкой
-
-      # Если сборка не нужна и вы загружаете папку со статикой напрямую:
       - name: Deploy static files to Yandex Cloud
         uses: sergeevpasha/yandex-cloud-s3-sync-github-actions@v0.1.0
         with:
@@ -38,3 +20,17 @@ jobs:
           YANDEX_CLOUD_BUCKET_NAME: ${{ secrets.YANDEX_CLOUD_BUCKET_NAME }}
           PATH: "./"          # Путь к папке с вашими HTML/CSS/JS файлами
           CLEAR: true         # Опционально: очищает бакет перед загрузкой
+
+      - name: Sync to Yandex Cloud
+        run: |
+          aws s3 sync ./ s3://${{ secrets.YANDEX_CLOUD_BUCKET_NAME }} \
+            --endpoint-url https://storage.yandexcloud.net \
+            --access-key-id ${{ secrets.YANDEX_CLOUD_ACCESS_KEY_ID }} \
+            --secret-access-key ${{ secrets.YANDEX_CLOUD_SECRET_ACCESS_KEY }} \
+            --delete \
+            --content-type "text/html" \
+            --exclude "*.css" \
+            --exclude "*.js" \
+            --exclude "*.png" \
+            --exclude "*.jpg" \
+            --exclude "*.svg"
