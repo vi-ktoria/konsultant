@@ -1,4 +1,4 @@
-const API_BASE = "https://k-6a3f.onrender.com";
+const API_BASE = "https://k-6a3f.onrender.com/api";
 
 async function loadArticles() {
     const grid = document.getElementById('articlesGrid');
