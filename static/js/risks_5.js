@@ -1,4 +1,4 @@
-const ARTICLE_SLUG = 'zashchita-pokupatelya-pri-osparivanii-sdelki-kupli-prodazhi-nedvizhimosti-st-177-178-179-gk-rf';
+const ARTICLE_SLUG = 'riski-pri-pokupke-kvartiry-poluchennoy-v-nasledstvo-skrytye-nasledniki-osparivanie-sdelok-i-zashchita-pokupatelya';
 
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');

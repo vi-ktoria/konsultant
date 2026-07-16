@@ -62,12 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
             grid.appendChild(card);
         });
 
-        const emptyCardsCount = Math.max(0, 6 - storiesData.length);
-        for (let i = 0; i < emptyCardsCount; i++) {
-            const emptyCard = document.createElement('div');
-            emptyCard.className = 'story-card empty-card';
-            grid.appendChild(emptyCard);
-        }
+        
     }
 
     // ===== Открытие модального окна =====
@@ -78,10 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const modal = document.getElementById('storyModal');
         const modalBody = document.getElementById('modalBody');
 
-        modalBody.innerHTML = `
-            <h2 class="modal-title">${story.title}</h2>
-            ${story.content}
-        `;
+        modalBody.innerHTML = story.content;
 
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -196,5 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(updateTemplatesButtons, 100);
     }
 
+    storiesLoaded.then(function () {
     renderStories();
+});
 });

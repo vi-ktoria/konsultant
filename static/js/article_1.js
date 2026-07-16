@@ -1,5 +1,5 @@
-const ARTICLE_SLUG = 'zavereniya-ob-obstoyatelstvah-st-431-2-gk-rf-chto-eto-takoe-i-v-chem-ih-polza-pri-pokupke-nedvizhimosti-i-ne-tolko';
-
+const params = new URLSearchParams(window.location.search);
+const ARTICLE_SLUG = params.get('slug');
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
   const contentsContainer = document.getElementById('articleContents');
@@ -37,13 +37,23 @@ function renderArticleContents(contents) {
 
 async function loadRiskArticleFromDatabase() {
   const titleElement = document.getElementById('articleTitle');
-  const descriptionElement = document.getElementById('articleDescription');
-  const contentElement = document.getElementById('articleContent');
+const descriptionElement = document.getElementById('articleDescription');
+const introElement = document.getElementById('articleIntro');
+const contentElement = document.getElementById('articleContent');
 
-  if (!titleElement || !descriptionElement || !contentElement) {
+  if (!titleElement || !descriptionElement || !introElement || !contentElement) {
     console.error('На странице нет нужных блоков для вывода статьи.');
     return;
   }
+  if (!ARTICLE_SLUG) {
+        titleElement.textContent = 'Статья не выбрана';
+        descriptionElement.textContent = '';
+        introElement.innerHTML = '';
+        contentElement.innerHTML =
+            '<p>Вернитесь к списку статей и выберите материал.</p>';
+        return;
+    }
+
 
   const { data, error } = await supabaseClient
     .from('content_items')
@@ -61,12 +71,56 @@ async function loadRiskArticleFromDatabase() {
   }
 
   document.title = data.title || 'Статья';
+titleElement.textContent = data.title || 'Без названия';
+descriptionElement.textContent = data.short_description || '';
 
-  titleElement.textContent = data.title || 'Без названия';
-  descriptionElement.textContent = data.short_description || '';
-  contentElement.innerHTML = data.content || '<p>Текст статьи пока не добавлен.</p>';
+const temporaryContainer = document.createElement('div');
 
-  renderArticleContents(data.contents);
+temporaryContainer.innerHTML =
+    data.content || '<p>Текст статьи пока не добавлен.</p>';
+
+const firstArticleHeading = temporaryContainer.querySelector('h2');
+
+introElement.innerHTML = '';
+contentElement.innerHTML = '';
+
+if (firstArticleHeading) {
+    let currentNode = temporaryContainer.firstChild;
+
+    /*
+     * Всё, что находится до первого h2,
+     * считается кратким содержанием статьи.
+     */
+    while (currentNode && currentNode !== firstArticleHeading) {
+        const nextNode = currentNode.nextSibling;
+        introElement.appendChild(currentNode);
+        currentNode = nextNode;
+    }
+
+    /*
+     * Первый h2 и весь оставшийся текст
+     * отправляются в основной блок статьи.
+     */
+    while (temporaryContainer.firstChild) {
+        contentElement.appendChild(temporaryContainer.firstChild);
+    }
+} else {
+    /*
+     * Если h2 в статье нет, показываем весь текст
+     * как вводную часть.
+     */
+    while (temporaryContainer.firstChild) {
+        introElement.appendChild(temporaryContainer.firstChild);
+    }
+}
+
+introElement.style.display =
+    introElement.textContent.trim() ? 'block' : 'none';
+
+contentElement.style.display =
+    contentElement.textContent.trim() ? 'block' : 'none';
+
+renderArticleContents(data.contents);
 }
 
 loadRiskArticleFromDatabase();

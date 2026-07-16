@@ -23,7 +23,7 @@ async function loadArticles() {
         }
 
         grid.innerHTML = articles.map(article => `
-            <a href="article.html?slug=${article.slug}" class="article-card">
+            <a href="article_1.html?slug=${encodeURIComponent(article.slug)}" class="article-card">
                 <div class="article-card-content">
                     <h3 class="article-title">${article.title}</h3>
                     ${article.category ? `<span class="article-category">${article.category}</span>` : ''}

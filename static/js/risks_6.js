@@ -1,4 +1,4 @@
-const ARTICLE_SLUG = 'zashchita-pokupatelya-pri-osparivanii-sdelki-kupli-prodazhi-nedvizhimosti-st-177-178-179-gk-rf';
+const ARTICLE_SLUG = 'pokupka-nedvizhimosti-u-prodavtsa-s-dolgami-bankrota-kakie-est-riski';
 
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
