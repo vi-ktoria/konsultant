@@ -62,7 +62,10 @@ async function geocodeAddress(address) {
         throw new Error("Адрес не найден");
     }
 
-    return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+    return {
+        coords: [parseFloat(data[0].lat), parseFloat(data[0].lon)],
+        displayName: data[0].display_name
+    };
 }
 
 // OVERPASS
@@ -239,14 +242,14 @@ app.get("/api/geo-data", async (req, res) => {
     }
 
     try {
-        const coords = await geocodeAddress(address);
-        const [lat, lon] = coords;
+        const geo = await geocodeAddress(address);
+        const [lat, lon] = geo.coords;
 
         const rawElements = await fetchProblemObjects(lat, lon, MAX_RADIUS_M);
         const problemLayers = convertOverpassElements(rawElements);
 
         const result = {
-            property: { coords },
+            property: { coords: geo.coords, address: geo.displayName },
             problemLayers
         };
 
