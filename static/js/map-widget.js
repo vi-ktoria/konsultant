@@ -157,8 +157,12 @@ async function initGeoWidget() {
 
     const property = {
         coords: geoData.property.coords,
+        address: geoData.property.address,
         radius: 500
     };
+    console.log("geoData.property:", geoData.property);
+    
+    document.getElementById("property-address-display").textContent = `📍 ${property.address}`;
 
     const problemLayers = geoData.problemLayers;
 
