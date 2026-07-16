@@ -1,4 +1,4 @@
-const ARTICLE_SLUG = 'riski-pri-pokupke-nedvizhimosti-u-zastroyshchika-kak-ne-poteryat-kvartiru-i-dengi';
+const ARTICLE_SLUG = 'privatizatsiya-zhilya-bez-oshibok-kto-imeet-pravo-kak-oformit-i-kakie-riski-vazhno-proverit';
 
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
