@@ -12,7 +12,7 @@ app = FastAPI(
     description="API для анализа рисков при покупке недвижимости"
 )
 
-# CORS — разрешаем запросы с любых источников для разработки
+# вот тут разрешить только с нашего
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "").split(","),
