@@ -341,3 +341,25 @@
         width: 100%;
     }
 }
+/* Названия статей в карточках */
+#articlesGrid h2,
+#articlesGrid h3 {
+    margin: 0 0 16px;
+    font-size: 26px;
+    line-height: 1.35;
+    font-weight: 600;
+}
+
+/* Убираем постоянное подчёркивание у карточек */
+#articlesGrid a {
+    color: #123f52;
+    text-decoration: none;
+}
+
+/* Подчёркивание появляется только при наведении на название */
+#articlesGrid a:hover h2,
+#articlesGrid a:hover h3 {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+}
