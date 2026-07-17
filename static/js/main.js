@@ -37,11 +37,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // ===== Рендеринг историй =====
     function renderStories() {
         const grid = document.getElementById('storiesGrid');
-        if (!grid || !storiesData || storiesData.length === 0) return;
+        if (!grid) return;
+
+        if (!window.storiesData || window.storiesData.length === 0) {
+            grid.innerHTML = `
+                <p style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #1a3a4a; opacity: 0.6;">
+                    Истории пока не добавлены
+                </p>
+            `;
+            return;
+        }
 
         grid.innerHTML = '';
 
-        storiesData.forEach(story => {
+        window.storiesData.forEach(story => {
             const card = document.createElement('div');
             card.className = 'story-card';
             card.dataset.storyId = story.id;
@@ -49,62 +58,54 @@ document.addEventListener('DOMContentLoaded', function() {
             card.innerHTML = `
                 <div class="story-preview">
                     <h3 class="story-title">${story.title}</h3>
-                    <p class="story-excerpt">${story.excerpt}</p>
+                    <p class="story-excerpt">${story.excerpt || ''}</p>
                 </div>
             `;
 
             card.addEventListener('click', function() {
-                openStoryModal(story.id);
+                if (window.openStoryModal) {
+                    window.openStoryModal(story.id);
+                }
             });
 
             grid.appendChild(card);
         });
-
-        
     }
 
-    // ===== Открытие модального окна =====
-    function openStoryModal(storyId) {
-        const story = storiesData.find(s => s.id === storyId);
-        if (!story) return;
+    // Регистрируем callback для рендеринга после загрузки данных
+    window.renderStoriesCallback = renderStories;
 
-        const modal = document.getElementById('storyModal');
-        const modalBody = document.getElementById('modalBody');
-
-        modalBody.innerHTML = story.content;
-
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    // ===== Закрытие модального окна =====
+    // ===== Закрытие модального окна по клику на фон или крестик =====
     const modal = document.getElementById('storyModal');
     const closeBtn = document.getElementById('closeModalBtn');
 
     if (closeBtn) {
         closeBtn.addEventListener('click', function() {
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
+            if (window.closeStoryModal) {
+                window.closeStoryModal();
+            }
         });
     }
 
     if (modal) {
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
-                modal.classList.remove('active');
-                document.body.style.overflow = '';
+                if (window.closeStoryModal) {
+                    window.closeStoryModal();
+                }
             }
         });
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && modal.classList.contains('active')) {
-                modal.classList.remove('active');
-                document.body.style.overflow = '';
+                if (window.closeStoryModal) {
+                    window.closeStoryModal();
+                }
             }
         });
     }
 
-    // ===== Блок историй =====
+    // ===== Карусель историй =====
     const wrapper = document.getElementById('storiesWrapper');
     const leftBtn = document.getElementById('scrollLeft');
     const rightBtn = document.getElementById('scrollRight');
@@ -145,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(updateButtons, 100);
     }
 
-    // ===== Блок шаблонов документов =====
+    // ===== Карусель шаблонов =====
     const templatesWrapper = document.querySelector('.templates-wrapper');
     const templatesLeftBtn = document.querySelector('.templates-scroll-left');
     const templatesRightBtn = document.querySelector('.templates-scroll-right');
@@ -186,7 +187,8 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(updateTemplatesButtons, 100);
     }
 
-    storiesLoaded.then(function () {
-    renderStories();
-});
+    // Если истории уже загружены, рендерим сразу
+    if (window.storiesData && window.storiesData.length > 0) {
+        renderStories();
+    }
 });

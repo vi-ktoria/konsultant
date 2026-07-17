@@ -7,84 +7,77 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function loadFaq() {
-        const { data, error } = await supabaseClient
-            .from('content_items')
-            .select('id, title, content')
-            .eq('type', 'faq')
-            .eq('is_published', true)
-            .order('id', { ascending: true });
+        try {
+            if (typeof API_BASE === 'undefined') {
+                throw new Error('API_BASE не определён. Проверьте config.js');
+            }
 
-        if (error) {
-            console.error('Ошибка загрузки вопросов из Supabase:', error);
+            console.log('Загрузка FAQ из:', `${API_BASE}/faq?limit=50`);
 
-            faqGrid.innerHTML =
-                '<p class="faq-status">Не удалось загрузить вопросы.</p>';
+            const response = await fetch(`${API_BASE}/faq?limit=50`);
 
-            return;
-        }
+            if (!response.ok) {
+                throw new Error(`Ошибка HTTP: ${response.status}`);
+            }
 
-        faqGrid.innerHTML = '';
+            const data = await response.json();
 
-        if (!data || data.length === 0) {
-            faqGrid.innerHTML =
-                '<p class="faq-status">Вопросы пока не добавлены.</p>';
+            if (!data || data.length === 0) {
+                faqGrid.innerHTML = '<p class="faq-status">Вопросы пока не добавлены.</p>';
+                return;
+            }
 
-            return;
-        }
+            faqGrid.innerHTML = '';
 
-        data.forEach(function (faq) {
-            const faqItem = document.createElement('div');
-            faqItem.className = 'faq-item';
+            data.forEach(function (faq) {
+                const faqItem = document.createElement('div');
+                faqItem.className = 'faq-item';
 
-            const faqQuestion = document.createElement('button');
-            faqQuestion.className = 'faq-question';
-            faqQuestion.type = 'button';
-            faqQuestion.textContent = faq.title;
-            faqQuestion.setAttribute('aria-expanded', 'false');
+                const faqQuestion = document.createElement('button');
+                faqQuestion.className = 'faq-question';
+                faqQuestion.type = 'button';
+                faqQuestion.textContent = faq.title;
+                faqQuestion.setAttribute('aria-expanded', 'false');
 
-            const faqAnswer = document.createElement('div');
-            faqAnswer.className = 'faq-answer';
-            faqAnswer.innerHTML =
-                faq.content || '<p>Ответ пока не добавлен.</p>';
-            faqAnswer.hidden = true;
+                const faqAnswer = document.createElement('div');
+                faqAnswer.className = 'faq-answer';
+                faqAnswer.innerHTML = faq.content || '<p>Ответ пока не добавлен.</p>';
+                faqAnswer.hidden = true;
 
-            faqQuestion.addEventListener('click', function () {
-                const isOpen = faqItem.classList.contains('open');
+                faqQuestion.addEventListener('click', function () {
+                    const isOpen = faqItem.classList.contains('open');
 
-                document
-                    .querySelectorAll('#faqGrid .faq-item.open')
-                    .forEach(function (openedItem) {
+                    document.querySelectorAll('#faqGrid .faq-item.open').forEach(function (openedItem) {
                         openedItem.classList.remove('open');
-
-                        const openedQuestion =
-                            openedItem.querySelector('.faq-question');
-
-                        const openedAnswer =
-                            openedItem.querySelector('.faq-answer');
-
-                        openedQuestion.setAttribute(
-                            'aria-expanded',
-                            'false'
-                        );
-
+                        const openedQuestion = openedItem.querySelector('.faq-question');
+                        const openedAnswer = openedItem.querySelector('.faq-answer');
+                        openedQuestion.setAttribute('aria-expanded', 'false');
                         openedAnswer.hidden = true;
                     });
 
-                if (!isOpen) {
-                    faqItem.classList.add('open');
-                    faqQuestion.setAttribute('aria-expanded', 'true');
-                    faqAnswer.hidden = false;
-                }
+                    if (!isOpen) {
+                        faqItem.classList.add('open');
+                        faqQuestion.setAttribute('aria-expanded', 'true');
+                        faqAnswer.hidden = false;
+                    }
+                });
+
+                faqItem.appendChild(faqQuestion);
+                faqItem.appendChild(faqAnswer);
+                faqGrid.prepend(faqItem);
             });
 
-            faqItem.appendChild(faqQuestion);
-            faqItem.appendChild(faqAnswer);
-            faqGrid.appendChild(faqItem);
-        });
+        } catch (error) {
+            console.error('Ошибка загрузки FAQ:', error);
+            faqGrid.innerHTML = '<p class="faq-status">Не удалось загрузить вопросы.</p>';
+        }
     }
 
     loadFaq();
 });
+
+// ===== Термины-подсказки (term-popup) =====
+
 function getTermPopupOverlay() {
     let overlay = document.querySelector('.term-popup-overlay');
 
@@ -100,17 +93,13 @@ function getTermPopupOverlay() {
 }
 
 function closeTermPopup() {
-    document
-        .querySelectorAll('.term-popup:not([hidden])')
-        .forEach(function (popup) {
-            popup.hidden = true;
-        });
+    document.querySelectorAll('.term-popup:not([hidden])').forEach(function (popup) {
+        popup.hidden = true;
+    });
 
-    document
-        .querySelectorAll('.term-explanation[aria-expanded="true"]')
-        .forEach(function (button) {
-            button.setAttribute('aria-expanded', 'false');
-        });
+    document.querySelectorAll('.term-explanation[aria-expanded="true"]').forEach(function (button) {
+        button.setAttribute('aria-expanded', 'false');
+    });
 
     const overlay = document.querySelector('.term-popup-overlay');
 
@@ -129,16 +118,12 @@ document.addEventListener('click', function (event) {
         const popup = document.getElementById(popupId);
 
         if (!popup) {
-            console.error(`Не найден блок с id="${popupId}".`);
+            console.error('Не найден блок с id="' + popupId + '".');
             return;
         }
 
         closeTermPopup();
 
-        /*
-         * Переносим карточку в body, чтобы она не обрезалась
-         * границами блока FAQ.
-         */
         document.body.appendChild(popup);
 
         const overlay = getTermPopupOverlay();

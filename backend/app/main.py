@@ -3,7 +3,14 @@ import traceback
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import content_router, search_router, risks_router, articles_router
+from .routers import (
+    content_router,
+    articles_router,
+    stories_router,
+    risks_router,
+    faq_router,
+    search_router
+)
 from .config import config
 
 app = FastAPI(
@@ -22,9 +29,11 @@ app.add_middleware(
 )
 
 app.include_router(content_router, prefix=config.API_PREFIX)
-app.include_router(search_router, prefix=config.API_PREFIX)
-app.include_router(risks_router, prefix=config.API_PREFIX)
 app.include_router(articles_router, prefix=config.API_PREFIX)
+app.include_router(stories_router, prefix=config.API_PREFIX)
+app.include_router(risks_router, prefix=config.API_PREFIX)
+app.include_router(faq_router, prefix=config.API_PREFIX)
+app.include_router(search_router, prefix=config.API_PREFIX)
 
 @app.get("/")
 def root():
