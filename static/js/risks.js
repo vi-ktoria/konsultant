@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             const content = document.createElement('div');
             content.className = 'risks-card-content';
             content.innerHTML = `
-                ${risk.short_description ? `<p>${risk.short_description}</p>` : ''}
-                <a href="article.html?slug=${risk.slug}">Подробнее →</a>
+                <p>${risk.short_description || ''}</p>
+                <a href="risk.html?slug=${risk.slug}">Подробнее →</a>
             `;
 
             details.appendChild(summary);
