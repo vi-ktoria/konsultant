@@ -43,7 +43,8 @@
                 <div class="right-column">
                     <h4>Поиск по статьям, документам и вопросам</h4>
                     <div class="search-wrapper">
-                        <input type="text" class="search-input" placeholder="Покупка квартиры" />
+                        <input class="search-input" type="text" placeholder="Покупка квартиры" data-search-input data-results="#searchResults">
+                        <div class="search-results" id="searchResults"></div>
                     </div>
                     <div class="nav-block">
                         <h5>Полезные материалы</h5>
@@ -142,6 +143,7 @@
     <script src="static/js/stories.js"></script>
     <script src="static/js/main.js"></script>
     <script src="static/js/faq.js"></script>
+    <script src="static/js/search.js"></script>
     <script src="static/js/risk-search.js"></script>
 </body>
 </html>

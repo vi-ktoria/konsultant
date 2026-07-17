@@ -22,17 +22,20 @@ class ContentItem(ContentItemBase):
     class Config:
         from_attributes = True
 
-class SearchRequest(BaseModel):
-    query: str
-    limit: int = 10
-    content_type: Optional[str] = None
-
 class SearchResult(BaseModel):
     id: int
     type: str
     slug: str
     title: str
     short_description: Optional[str] = None
+    category: Optional[str] = None
+    tags: Optional[str] = None
+    relevance: float  # ← добавили поле релевантности
+
+class SearchRequest(BaseModel):
+    query: str
+    limit: int = 10
+    content_type: Optional[str] = None
 
 class RiskRequest(BaseModel):
     years_owned: int
