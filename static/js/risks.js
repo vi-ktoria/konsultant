@@ -1,21 +1,32 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    const container = document.querySelector('.risks-left');
+    const container = document.getElementById('risksContainer');
     if (!container) {
-        console.error('Контейнер .risks-left не найден');
+        console.error('Контейнер #risksContainer не найден');
         return;
     }
 
     try {
+        if (typeof API_BASE === 'undefined') {
+            throw new Error('API_BASE не определён. Проверьте подключение config.js');
+        }
+
+        console.log('Загрузка рисков из:', `${API_BASE}/content?type=risk&limit=50`);
+
         const response = await fetch(`${API_BASE}/content?type=risk&limit=50`);
         
         if (!response.ok) {
-            throw new Error('Ошибка загрузки рисков');
+            throw new Error(`Ошибка HTTP: ${response.status}`);
         }
 
         const risks = await response.json();
 
+        // Сортируем по id (или created_at) — от меньшего к большему
+        risks.sort((a, b) => (a.id || 0) - (b.id || 0));
+
+        console.log('Получено рисков:', risks.length);
+
         if (risks.length === 0) {
-            container.innerHTML += `
+            container.innerHTML = `
                 <p style="text-align: center; padding: 40px; color: #1a3a4a; opacity: 0.6;">
                     Риски пока не добавлены
                 </p>
@@ -23,12 +34,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
 
-        // Сохраняем hero секцию
-        const heroSection = container.querySelector('.risks-hero');
+        // Очищаем контейнер
         container.innerHTML = '';
-        if (heroSection) {
-            container.appendChild(heroSection);
-        }
 
         // Рендерим риски из API
         risks.forEach(risk => {
@@ -70,9 +77,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     } catch (error) {
         console.error('Ошибка загрузки рисков:', error);
-        container.innerHTML += `
+        container.innerHTML = `
             <p style="text-align: center; padding: 40px; color: #e74c3c;">
-                Не удалось загрузить риски
+                ❌ Не удалось загрузить риски: ${error.message}
             </p>
         `;
     }

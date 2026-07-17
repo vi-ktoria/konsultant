@@ -170,6 +170,7 @@ h2 {
 
 .risks-card {
   overflow: hidden;
+  margin-bottom: 16px;
 }
 
 .risks-card-title {
