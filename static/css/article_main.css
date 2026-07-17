@@ -341,25 +341,43 @@
         width: 100%;
     }
 }
-/* Названия статей в карточках */
-#articlesGrid h2,
-#articlesGrid h3 {
-    margin: 0 0 16px;
-    font-size: 26px;
-    line-height: 1.35;
+/* Ссылка-карточка статьи */
+#articlesGrid a.article-card,
+#articlesGrid a.article-card:link,
+#articlesGrid a.article-card:visited,
+#articlesGrid a.article-card:hover,
+#articlesGrid a.article-card:active {
+    color: #1a3a4a;
+    text-decoration: none !important;
+}
+
+/* Название статьи */
+#articlesGrid .article-title {
+    margin: 0 0 14px;
+    color: #1a3a4a;
+    font-size: 24px !important;
     font-weight: 600;
+    line-height: 1.3;
+    text-decoration: none !important;
 }
 
-/* Убираем постоянное подчёркивание у карточек */
-#articlesGrid a {
-    color: #123f52;
-    text-decoration: none;
+/* Не подчёркивать название при наведении */
+#articlesGrid .article-card:hover .article-title {
+    color: #2563eb;
+    text-decoration: none !important;
 }
 
-/* Подчёркивание появляется только при наведении на название */
-#articlesGrid a:hover h2,
-#articlesGrid a:hover h3 {
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 4px;
+/* Категория, описание, дата и ссылка "Читать" */
+#articlesGrid .article-category,
+#articlesGrid .article-excerpt,
+#articlesGrid .article-date,
+#articlesGrid .article-read {
+    text-decoration: none !important;
+}
+
+/* На телефоне заголовок ещё немного меньше */
+@media (max-width: 768px) {
+    #articlesGrid .article-title {
+        font-size: 20px !important;
+    }
 }
