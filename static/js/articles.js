@@ -1,5 +1,3 @@
-const API_BASE = "https://k-6a3f.onrender.com/api";
-
 async function loadArticles() {
     const grid = document.getElementById('articlesGrid');
     if (!grid) return;
@@ -23,7 +21,7 @@ async function loadArticles() {
         }
 
         grid.innerHTML = articles.map(article => `
-            <a href="article_1.html?slug=${encodeURIComponent(article.slug)}" class="article-card">
+            <a href="article.html?slug=${encodeURIComponent(article.slug)}" class="article-card">
                 <div class="article-card-content">
                     <h3 class="article-title">${article.title}</h3>
                     ${article.category ? `<span class="article-category">${article.category}</span>` : ''}
