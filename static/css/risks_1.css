@@ -512,3 +512,6 @@ h1 {
 #articleIntro {
     margin-bottom: 28px;
 }
+#articleDescription {
+  display: none;
+}
