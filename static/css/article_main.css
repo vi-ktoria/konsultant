@@ -341,43 +341,44 @@
         width: 100%;
     }
 }
-/* Ссылка-карточка статьи */
-#articlesGrid a.article-card,
-#articlesGrid a.article-card:link,
-#articlesGrid a.article-card:visited,
-#articlesGrid a.article-card:hover,
-#articlesGrid a.article-card:active {
+/* ===== Карточки на странице списка статей ===== */
+
+#articlesGrid .article-card,
+#articlesGrid .article-card:link,
+#articlesGrid .article-card:visited,
+#articlesGrid .article-card:hover,
+#articlesGrid .article-card:active {
     color: #1a3a4a;
     text-decoration: none !important;
 }
 
 /* Название статьи */
-#articlesGrid .article-title {
+#articlesGrid .article-card .article-title {
     margin: 0 0 14px;
     color: #1a3a4a;
-    font-size: 24px !important;
+    font-size: 22px !important;
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.35;
     text-decoration: none !important;
 }
 
-/* Не подчёркивать название при наведении */
+/* Никакого подчёркивания при наведении */
 #articlesGrid .article-card:hover .article-title {
     color: #2563eb;
     text-decoration: none !important;
 }
 
-/* Категория, описание, дата и ссылка "Читать" */
+/* Остальные элементы карточки */
 #articlesGrid .article-category,
 #articlesGrid .article-excerpt,
+#articlesGrid .article-meta,
 #articlesGrid .article-date,
 #articlesGrid .article-read {
     text-decoration: none !important;
 }
 
-/* На телефоне заголовок ещё немного меньше */
 @media (max-width: 768px) {
-    #articlesGrid .article-title {
-        font-size: 20px !important;
+    #articlesGrid .article-card .article-title {
+        font-size: 19px !important;
     }
 }
