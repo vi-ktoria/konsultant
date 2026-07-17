@@ -1,72 +1,88 @@
-const ARTICLE_SLUG = 'poshagovaya-instruktsiya-po-priobreteniyu-nedvizhimosti';
+document.addEventListener('DOMContentLoaded', function () {
+    const ARTICLE_SLUG = 'poshagovaya-instruktsiya-po-priobreteniyu-nedvizhimosti';
 
-function renderArticleContents(contents) {
-  const contentsBlock = document.getElementById('articleContentsBlock');
-  const contentsContainer = document.getElementById('articleContents');
+    const titleElement = document.getElementById('articleTitle');
+    const descriptionElement = document.getElementById('articleDescription');
+    const contentElement = document.getElementById('articleContent');
+    const contentsBlock = document.getElementById('articleContentsBlock');
+    const contentsContainer = document.getElementById('articleContents');
 
-  if (!contentsBlock || !contentsContainer) {
-    return;
-  }
-
-  let parsedContents = contents;
-
-  if (typeof parsedContents === 'string') {
-    try {
-      parsedContents = JSON.parse(parsedContents);
-    } catch (error) {
-      console.error('Ошибка чтения contents:', error);
-      parsedContents = [];
+    if (!titleElement || !descriptionElement || !contentElement) {
+        console.error('На странице нет нужных блоков для вывода статьи.');
+        return;
     }
-  }
 
-  if (!Array.isArray(parsedContents) || parsedContents.length === 0) {
-    contentsBlock.style.display = 'none';
-    return;
-  }
+    async function loadGuide() {
+        try {
+            if (typeof API_BASE === 'undefined') {
+                throw new Error('API_BASE не определён. Проверьте config.js');
+            }
 
-  contentsContainer.innerHTML = parsedContents.map((item) => {
-    return `
-      <a class="article-contents-link" href="${item.href}">
-        ${item.title}
-      </a>
-    `;
-  }).join('');
+            console.log('Загрузка инструкции из:', `${API_BASE}/content/${ARTICLE_SLUG}`);
 
-  contentsBlock.style.display = 'block';
-}
+            const response = await fetch(`${API_BASE}/content/${ARTICLE_SLUG}`);
 
-async function loadRiskArticleFromDatabase() {
-  const titleElement = document.getElementById('articleTitle');
-  const descriptionElement = document.getElementById('articleDescription');
-  const contentElement = document.getElementById('articleContent');
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error('Инструкция не найдена');
+                }
+                throw new Error(`Ошибка HTTP: ${response.status}`);
+            }
 
-  if (!titleElement || !descriptionElement || !contentElement) {
-    console.error('На странице нет нужных блоков для вывода статьи.');
-    return;
-  }
+            const data = await response.json();
 
-  const { data, error } = await supabaseClient
-    .from('content_items')
-    .select('*')
-    .eq('slug', ARTICLE_SLUG)
-    .eq('is_published', true)
-    .single();
+            document.title = data.title || 'С чего начать покупку';
+            titleElement.textContent = data.title || 'С чего начать покупку';
+            descriptionElement.textContent = data.short_description || '';
 
-  if (error) {
-    console.error('Ошибка загрузки статьи из Supabase:', error);
-    titleElement.textContent = 'Статья не найдена';
-    descriptionElement.textContent = '';
-    contentElement.innerHTML = '<p>Проверьте slug статьи и поле is_published в базе данных.</p>';
-    return;
-  }
+            // Рендерим содержимое
+            contentElement.innerHTML = data.content || '<p>Текст инструкции пока не добавлен.</p>';
 
-  document.title = data.title || 'Статья';
+            // Рендерим содержание (оглавление)
+            renderArticleContents(data.contents);
 
-  titleElement.textContent = data.title || 'Без названия';
-  descriptionElement.textContent = data.short_description || '';
-  contentElement.innerHTML = data.content || '<p>Текст статьи пока не добавлен.</p>';
+        } catch (error) {
+            console.error('Ошибка загрузки инструкции:', error);
+            titleElement.textContent = 'Инструкция не найдена';
+            descriptionElement.textContent = '';
+            contentElement.innerHTML = `
+                <p style="color: #e74c3c;">❌ ${error.message}</p>
+                <p><a href="../../index.html">Вернуться на главную</a></p>
+            `;
+        }
+    }
 
-  renderArticleContents(data.contents);
-}
+    function renderArticleContents(contents) {
+        if (!contentsBlock || !contentsContainer) {
+            return;
+        }
 
-loadRiskArticleFromDatabase();
+        let parsedContents = contents;
+
+        if (typeof parsedContents === 'string') {
+            try {
+                parsedContents = JSON.parse(parsedContents);
+            } catch (error) {
+                console.error('Ошибка чтения contents:', error);
+                parsedContents = [];
+            }
+        }
+
+        if (!Array.isArray(parsedContents) || parsedContents.length === 0) {
+            contentsBlock.style.display = 'none';
+            return;
+        }
+
+        contentsContainer.innerHTML = parsedContents.map(function (item) {
+            return `
+                <a class="article-contents-link" href="${item.href}">
+                    ${item.title}
+                </a>
+            `;
+        }).join('');
+
+        contentsBlock.style.display = 'block';
+    }
+
+    loadGuide();
+});
