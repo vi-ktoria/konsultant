@@ -1,5 +1,3 @@
-const API_BASE = "https://k-6a3f.onrender.com";
-
 document.addEventListener('DOMContentLoaded', function() {
     // ===== Плавный скролл =====
     const navbarHeight = document.querySelector('.navbar').offsetHeight;

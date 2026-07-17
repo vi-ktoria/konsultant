@@ -1,26 +1,22 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Статьи — Сервис анализа рисков</title>
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="stylesheet" href="../css/article_main.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Статья — Сервис анализа рисков</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/articles.css">
     <link rel="stylesheet" href="../css/logo.css">
 </head>
 <body>
     <header class="navbar">
-    <a class="logo" href="../../index.html" aria-label="Перейти на главную страницу">
-        <img
-            class="logo-image"
-            src="../images/logo.png"
-            alt="Квартира без риска"
-        />
-    </a>
+        <a class="logo" href="../../index.html" aria-label="Перейти на главную страницу">
+            <img class="logo-image" src="../images/logo.png" alt="Квартира без риска" />
+        </a>
         <nav>
             <ul class="nav-links">
                 <li><a href="/index.html">Главная</a></li>
-                <li><a href="articles.html" class="active">Статьи</a></li>
+                <li><a href="articles.html">Статьи</a></li>
                 <li><a href="/index.html#templatesSection">Шаблоны документов</a></li>
                 <li><a href="/index.html#storiesSection">Истории из жизни</a></li>
                 <li><a href="/index.html#faqSection">Вопросы и ответы</a></li>
@@ -33,13 +29,20 @@
             <div class="article-left">
 
                 <section class="article-hero">
-                    <h1>Статьи</h1>
-                    <p class="article-subtext">Полезные материалы по покупке недвижимости</p>
+                    <h1 id="articleTitle">Загрузка статьи...</h1>
+                    <p id="articleDescription"></p>
                 </section>
 
-                <div class="articles-grid" id="articlesGrid">
-                    <!-- Статьи будут подставлены через JavaScript -->
-                </div>
+                <section class="article-section" id="articleIntro">
+                    <p>Загрузка...</p>
+                </section>
+
+                <section class="article-contents" id="articleContentsBlock" style="display: none;">
+                    <h2>Читайте в статье</h2>
+                    <div class="article-contents-list" id="articleContents"></div>
+                </section>
+
+                <section class="article-section" id="articleContent"></section>
 
             </div>
 
@@ -54,7 +57,7 @@
 
                 <section class="article-start-card">
                     <h3>С чего начать покупку?</h3>
-                    <a href="start-guide.html" class="instruction-btn">Открыть инструкцию →</a>
+                    <a class="instruction-btn" href="start-guide.html">Открыть инструкцию →</a>
                 </section>
 
                 <section class="article-materials">
@@ -73,6 +76,6 @@
     <script src="../js/supabase-client.js"></script>
     <script src="../js/content-api.js"></script>
     <script src="../js/search.js"></script>
-    <script src="../js/articles.js"></script>
+    <script src="../js/article.js"></script>
 </body>
 </html>
