@@ -1,0 +1,21 @@
+.logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  text-decoration: none;
+}
+
+.logo-image {
+  display: block;
+  width: 400px;
+  height: auto;
+  max-width: none;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .logo-image {
+    width: 220px;
+    height: auto;
+  }
+}
