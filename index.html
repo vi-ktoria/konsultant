@@ -62,39 +62,8 @@
                 <div class="templates-carousel">
                     <button class="scroll-btn scroll-left templates-scroll-left">‹</button>
                     <div class="templates-wrapper">
-                        <div class="templates-grid">
-                            <div class="template-card" onclick="location.href='static/html/template_viewer.html?slug=dogovor-kupli-prodaji'">
-                                <img src="static/images/dogovor_kupli_prodagi.png" alt="Договор купли-продажи" class="template-image" />
-                                <div class="template-overlay">
-                                    <h3 class="template-title">Договор купли-продажи</h3>
-                                    <p class="template-excerpt">Открыть шаблон →</p>
-                                </div>
-                            </div>
-                            <div class="template-card">
-                                <div class="template-preview">
-                                    <div class="template-image-placeholder"></div>
-                                </div>
-                            </div>
-                            <div class="template-card">
-                                <div class="template-preview">
-                                    <div class="template-image-placeholder"></div>
-                                </div>
-                            </div>
-                            <div class="template-card">
-                                <div class="template-preview">
-                                    <div class="template-image-placeholder"></div>
-                                </div>
-                            </div>
-                            <div class="template-card">
-                                <div class="template-preview">
-                                    <div class="template-image-placeholder"></div>
-                                </div>
-                            </div>
-                            <div class="template-card">
-                                <div class="template-preview">
-                                    <div class="template-image-placeholder"></div>
-                                </div>
-                            </div>
+                        <div class="templates-grid" id="templatesGrid">
+                            <p class="templates-status">Загрузка шаблонов...</p>
                         </div>
                     </div>
                     <button class="scroll-btn scroll-right templates-scroll-right">›</button>
@@ -140,6 +109,7 @@
 
     <script src="static/js/config.js"></script>
     <script src="static/js/supabase-client.js"></script>
+    <script src="static/js/templates.js"></script>
     <script src="static/js/stories.js"></script>
     <script src="static/js/main.js"></script>
     <script src="static/js/faq.js"></script>
