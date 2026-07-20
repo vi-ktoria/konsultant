@@ -50,7 +50,8 @@ function setCache(key, data) {
 
 // ГЕОКОДИРОВАНИЕ
 async function geocodeAddress(address) {
-    const url = `${NOMINATIM_URL}?format=json&countrycodes=ru&q=${encodeURIComponent(address)}`;
+    // const url = `${NOMINATIM_URL}?format=json&countrycodes=ru&q=${encodeURIComponent(address)}`;
+    const url = `${NOMINATIM_URL}?format=json&addressdetails=1&countrycodes=ru&q=${encodeURIComponent(address)}`;
 
     const response = await fetch(url, { headers: HEADERS });
     if (!response.ok) {
@@ -64,7 +65,8 @@ async function geocodeAddress(address) {
 
     return {
         coords: [parseFloat(data[0].lat), parseFloat(data[0].lon)],
-        displayName: data[0].display_name
+        displayName: data[0].display_name,
+        addressDebug: data[0].address // временно
     };
 }
 
@@ -249,7 +251,7 @@ app.get("/api/geo-data", async (req, res) => {
         const problemLayers = convertOverpassElements(rawElements);
 
         const result = {
-            property: { coords: geo.coords, address: geo.displayName },
+            property: { coords: geo.coords, address: geo.displayName, addressDebug: geo.addressDebug },
             problemLayers
         };
 
