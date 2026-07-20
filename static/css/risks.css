@@ -328,7 +328,9 @@ h2 {
   }
 }
 /* Выделенный информационный блок внутри текста риска */
-#risksContainer aside {
+#articleIntro aside,
+#articleContent aside {
+    display: block;
     box-sizing: border-box;
     width: 100%;
     margin: 24px 0;
@@ -340,16 +342,17 @@ h2 {
 }
 
 /* Текст внутри выделенного блока */
-#risksContainer aside p {
+#articleIntro aside p,
+#articleContent aside p {
     margin: 0;
     color: #2f6197;
     font-size: 20px;
-    font-weight: 700;
     line-height: 1.55;
 }
 
-/* Сохраняем жирное начертание */
-#risksContainer aside strong {
+/* Жирный текст из базы */
+#articleIntro aside strong,
+#articleContent aside strong {
     color: inherit;
     font-weight: 700;
 }
