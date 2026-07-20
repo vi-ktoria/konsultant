@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
             data.forEach(function (faq) {
                 const faqItem = document.createElement('div');
                 faqItem.className = 'faq-item';
+                faqItem.dataset.slug = faq.slug;
 
                 const faqQuestion = document.createElement('button');
                 faqQuestion.className = 'faq-question';

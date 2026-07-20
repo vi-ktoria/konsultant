@@ -94,6 +94,8 @@ async function openStoryModal(storyId) {
             modalContent.scrollTop = 0;
         }
 
+        window.scrollTo({ top: 1000, behavior: 'smooth' });
+
     } catch (error) {
         console.error('Ошибка загрузки истории:', error);
         modalBody.innerHTML = `
@@ -105,6 +107,8 @@ async function openStoryModal(storyId) {
         if (modalContent) {
             modalContent.scrollTop = 0;
         }
+
+        window.scrollTo({ top: 1000, behavior: 'smooth' });
     }
 }
 

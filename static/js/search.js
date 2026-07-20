@@ -9,6 +9,73 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let debounceTimer;
 
+        // Обработчик клика на результаты
+        resultsBlock.addEventListener('click', function(e) {
+            const link = e.target.closest('a.search-result-card');
+            if (link) {
+                e.preventDefault();
+                const href = link.getAttribute('href');
+                const type = link.dataset.type;
+                const slug = link.dataset.slug;
+
+                if (type === 'story') {
+                    // Используем существующую функцию из stories.js
+                    if (typeof window.openStoryModal === 'function') {
+                        // Ищем историю по slug в storiesData
+                        const story = window.storiesData?.find(s => s.slug === slug);
+                        if (story) {
+                            window.openStoryModal(story.id);
+                        } else {
+                            // Если нет в storiesData — загружаем по slug через API
+                            fetch(`${API_BASE}/stories/${slug}`)
+                                .then(r => r.json())
+                                .then(story => {
+                                    if (window.openStoryModal) {
+                                        window.openStoryModal(story.id);
+                                    }
+                                })
+                                .catch(err => console.error('Ошибка загрузки истории:', err));
+                        }
+                    }
+                } else if (type === 'faq') {
+                    // Открываем конкретный FAQ
+                    const faqItems = document.querySelectorAll('.faq-item');
+                    let targetFaq = null;
+                    
+                    faqItems.forEach(item => {
+                        if (item.dataset.slug === slug) {
+                            targetFaq = item;
+                        }
+                    });
+                    
+                    if (targetFaq) {
+                        // Закрываем все открытые
+                        document.querySelectorAll('.faq-item.open').forEach(item => {
+                            if (item !== targetFaq) {
+                                item.classList.remove('open');
+                                const q = item.querySelector('.faq-question');
+                                const a = item.querySelector('.faq-answer');
+                                if (q) q.setAttribute('aria-expanded', 'false');
+                                if (a) a.hidden = true;
+                            }
+                        });
+                        
+                        // Открываем нужный
+                        targetFaq.classList.add('open');
+                        const question = targetFaq.querySelector('.faq-question');
+                        const answer = targetFaq.querySelector('.faq-answer');
+                        if (question) question.setAttribute('aria-expanded', 'true');
+                        if (answer) answer.hidden = false;
+                        
+                        // Скроллим к FAQ
+                        targetFaq.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } else if (href && href !== '#' && href !== '') {
+                    window.location.href = href;
+                }
+            }
+        });
+
         input.addEventListener('input', () => {
             const query = input.value.trim();
 
@@ -16,6 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (query.length < 2) {
                 resultsBlock.innerHTML = '';
+                resultsBlock.style.display = 'none';
                 return;
             }
 
@@ -25,8 +93,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         throw new Error('API_BASE не определён. Проверьте config.js');
                     }
 
-                    console.log('Поиск запроса:', `${API_BASE}/search?q=${encodeURIComponent(query)}`);
-
                     const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);
 
                     if (!response.ok) {
@@ -35,6 +101,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     const results = await response.json();
 
+                    resultsBlock.style.display = 'block';
+
                     if (results.length === 0) {
                         resultsBlock.innerHTML = '<p class="search-empty">Ничего не найдено</p>';
                         return;
@@ -42,29 +110,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     resultsBlock.innerHTML = results.map((item) => {
                         let link = '#';
+                        let target = '_self';
 
                         switch (item.type) {
                             case 'article':
-                                link = `article.html?slug=${item.slug}`;
+                                link = `/static/html/article.html?slug=${encodeURIComponent(item.slug)}`;
                                 break;
                             case 'risk':
-                                link = `risk.html?slug=${item.slug}`;
+                                link = `/static/html/risk.html?slug=${encodeURIComponent(item.slug)}`;
                                 break;
                             case 'story':
-                                link = `../index.html#storiesSection`;
+                                link = '#';
                                 break;
                             case 'faq':
-                                link = `../index.html#faqSection`;
+                                link = '#';
                                 break;
                             case 'template':
-                                link = `template_viewer.html?slug=${item.slug}`;
+                                link = `/static/html/template_viewer.html?slug=${encodeURIComponent(item.slug)}`;
                                 break;
                             default:
                                 link = '#';
                         }
 
                         return `
-                            <a class="search-result-card" href="${link}">
+                            <a class="search-result-card" 
+                               href="${link}" 
+                               data-type="${item.type}" 
+                               data-slug="${encodeURIComponent(item.slug)}"
+                               target="${target}">
                                 <h4>${item.title}</h4>
                                 ${item.short_description ? `<p>${item.short_description}</p>` : ''}
                                 ${item.category ? `<span class="search-category">${item.category}</span>` : ''}
@@ -74,9 +147,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 } catch (error) {
                     console.error('Ошибка поиска:', error);
+                    resultsBlock.style.display = 'block';
                     resultsBlock.innerHTML = '<p class="search-error">Ошибка поиска. Попробуйте позже.</p>';
                 }
             }, 300);
         });
+
+        resultsBlock.addEventListener('mousedown', function(e) {
+            const link = e.target.closest('a.search-result-card');
+            if (link) {
+                e.preventDefault(); // важно: не даём input потерять фокус раньше времени
+            }
+        });
+
+        input.addEventListener('focus', function() {
+            if (resultsBlock.innerHTML && resultsBlock.innerHTML !== '') {
+                resultsBlock.style.display = 'block';
+            }
+        });
     });
-});   
+});
