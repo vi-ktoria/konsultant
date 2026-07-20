@@ -515,3 +515,29 @@ h1 {
 #articleDescription {
   display: none;
 }
+/* Выделенный информационный блок внутри текста риска */
+#risksContainer aside {
+    box-sizing: border-box;
+    width: 100%;
+    margin: 24px 0;
+    padding: 24px 26px;
+
+    background-color: #eef6ff;
+    border-left: 5px solid #4f83c3;
+    border-radius: 12px;
+}
+
+/* Текст внутри выделенного блока */
+#risksContainer aside p {
+    margin: 0;
+    color: #2f6197;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.55;
+}
+
+/* Сохраняем жирное начертание */
+#risksContainer aside strong {
+    color: inherit;
+    font-weight: 700;
+}
