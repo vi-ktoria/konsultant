@@ -213,26 +213,6 @@ h1 {
   font-weight: 700;
 }
 
-.search-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.search-input {
-  width: 100%;
-  padding: 14px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.7);
-  font-size: 16px;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #2563EB;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
 .article-search,
 .article-materials {
   padding: 0;

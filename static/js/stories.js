@@ -50,6 +50,7 @@ async function loadStoriesFromAPI() {
         window.storiesData = (data || []).map(function (story) {
             return {
                 id: story.id,
+                slug: story.slug,
                 title: story.title,
                 excerpt: createStoryExcerpt(story.content),
                 content: story.content
@@ -103,7 +104,7 @@ async function openStoryModal(storyId) {
         `;
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
-        
+
         if (modalContent) {
             modalContent.scrollTop = 0;
         }
@@ -125,5 +126,6 @@ function closeStoryModal() {
 window.openStoryModal = openStoryModal;
 window.closeStoryModal = closeStoryModal;
 
-// Загружаем истории
+// Загружаем истории. Промис сохраняем, чтобы другие скрипты
+// могли дождаться (await window.storiesLoaded) полной загрузки данных.
 window.storiesLoaded = loadStoriesFromAPI();

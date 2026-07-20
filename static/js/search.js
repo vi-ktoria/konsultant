@@ -1,6 +1,12 @@
 document.addEventListener('DOMContentLoaded', function () {
     const searchInputs = document.querySelectorAll('[data-search-input]');
 
+    // Проверяем, находимся ли мы на главной странице
+    function isHomePage() {
+        const path = window.location.pathname;
+        return path === '/' || path === '/index.html' || path === '';
+    }
+
     searchInputs.forEach((input) => {
         const resultsSelector = input.dataset.results;
         const resultsBlock = document.querySelector(resultsSelector);
@@ -9,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let debounceTimer;
 
-        // Обработчик клика на результаты
         resultsBlock.addEventListener('click', function(e) {
             const link = e.target.closest('a.search-result-card');
             if (link) {
@@ -19,56 +24,61 @@ document.addEventListener('DOMContentLoaded', function () {
                 const slug = link.dataset.slug;
 
                 if (type === 'story') {
-                    // Используем существующую функцию из stories.js
-                    if (typeof window.openStoryModal === 'function') {
-                        // Ищем историю по slug в storiesData
-                        const story = window.storiesData?.find(s => s.slug === slug);
-                        if (story) {
-                            window.openStoryModal(story.id);
-                        } else {
-                            // Если нет в storiesData — загружаем по slug через API
-                            fetch(`${API_BASE}/stories/${slug}`)
-                                .then(r => r.json())
-                                .then(story => {
-                                    if (window.openStoryModal) {
-                                        window.openStoryModal(story.id);
-                                    }
-                                })
-                                .catch(err => console.error('Ошибка загрузки истории:', err));
+                    if (isHomePage()) {
+                        // На главной — открываем модальное окно
+                        if (typeof window.openStoryModal === 'function') {
+                            const story = window.storiesData?.find(s => s.slug === slug);
+                            if (story) {
+                                window.openStoryModal(story.id);
+                            } else {
+                                fetch(`${API_BASE}/stories/${slug}`)
+                                    .then(r => r.json())
+                                    .then(story => {
+                                        if (window.openStoryModal) {
+                                            window.openStoryModal(story.id);
+                                        }
+                                    })
+                                    .catch(err => console.error('Ошибка загрузки истории:', err));
+                            }
                         }
+                    } else {
+                        // Не на главной — переходим на главную с параметром в query string
+                        window.location.href = `/index.html?story=${encodeURIComponent(slug)}`;
                     }
                 } else if (type === 'faq') {
-                    // Открываем конкретный FAQ
-                    const faqItems = document.querySelectorAll('.faq-item');
-                    let targetFaq = null;
-                    
-                    faqItems.forEach(item => {
-                        if (item.dataset.slug === slug) {
-                            targetFaq = item;
-                        }
-                    });
-                    
-                    if (targetFaq) {
-                        // Закрываем все открытые
-                        document.querySelectorAll('.faq-item.open').forEach(item => {
-                            if (item !== targetFaq) {
-                                item.classList.remove('open');
-                                const q = item.querySelector('.faq-question');
-                                const a = item.querySelector('.faq-answer');
-                                if (q) q.setAttribute('aria-expanded', 'false');
-                                if (a) a.hidden = true;
+                    if (isHomePage()) {
+                        // На главной — разворачиваем FAQ
+                        const faqItems = document.querySelectorAll('.faq-item');
+                        let targetFaq = null;
+
+                        faqItems.forEach(item => {
+                            if (item.dataset.slug === slug) {
+                                targetFaq = item;
                             }
                         });
-                        
-                        // Открываем нужный
-                        targetFaq.classList.add('open');
-                        const question = targetFaq.querySelector('.faq-question');
-                        const answer = targetFaq.querySelector('.faq-answer');
-                        if (question) question.setAttribute('aria-expanded', 'true');
-                        if (answer) answer.hidden = false;
-                        
-                        // Скроллим к FAQ
-                        targetFaq.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                        if (targetFaq) {
+                            document.querySelectorAll('.faq-item.open').forEach(item => {
+                                if (item !== targetFaq) {
+                                    item.classList.remove('open');
+                                    const q = item.querySelector('.faq-question');
+                                    const a = item.querySelector('.faq-answer');
+                                    if (q) q.setAttribute('aria-expanded', 'false');
+                                    if (a) a.hidden = true;
+                                }
+                            });
+
+                            targetFaq.classList.add('open');
+                            const question = targetFaq.querySelector('.faq-question');
+                            const answer = targetFaq.querySelector('.faq-answer');
+                            if (question) question.setAttribute('aria-expanded', 'true');
+                            if (answer) answer.hidden = false;
+
+                            targetFaq.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    } else {
+                        // Не на главной — переходим на главную с параметром в query string
+                        window.location.href = `/index.html?faq=${encodeURIComponent(slug)}`;
                     }
                 } else if (href && href !== '#' && href !== '') {
                     window.location.href = href;
@@ -110,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     resultsBlock.innerHTML = results.map((item) => {
                         let link = '#';
-                        let target = '_self';
 
                         switch (item.type) {
                             case 'article':
@@ -136,8 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             <a class="search-result-card" 
                                href="${link}" 
                                data-type="${item.type}" 
-                               data-slug="${encodeURIComponent(item.slug)}"
-                               target="${target}">
+                               data-slug="${encodeURIComponent(item.slug)}">
                                 <h4>${item.title}</h4>
                                 ${item.short_description ? `<p>${item.short_description}</p>` : ''}
                                 ${item.category ? `<span class="search-category">${item.category}</span>` : ''}
@@ -156,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
         resultsBlock.addEventListener('mousedown', function(e) {
             const link = e.target.closest('a.search-result-card');
             if (link) {
-                e.preventDefault(); // важно: не даём input потерять фокус раньше времени
+                e.preventDefault();
             }
         });
 
