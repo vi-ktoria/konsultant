@@ -403,6 +403,10 @@ html {
     scroll-behavior: smooth;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 .full-article-jump {
     display: flex;
     align-items: center;
