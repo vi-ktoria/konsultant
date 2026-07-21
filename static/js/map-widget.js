@@ -161,9 +161,19 @@ async function initGeoWidget() {
         radius: 500
     };
     console.log("geoData.property:", geoData.property);
-    
+
+    // вывод адреса
     document.getElementById("property-address-display").textContent = `📍 ${property.address}`;
 
+    // рег особенности
+    if (geoData.regionalWarningUrl) {
+        document.getElementById("regional-warning-container").innerHTML = `
+            <div class="regional-warning">
+                ⚠ В данном регионе процесс покупки недвижимости имеет особенности.
+                <a href="${geoData.regionalWarningUrl}" target="_blank">Подробнее</a>
+            </div>
+        `;
+    }
     const problemLayers = geoData.problemLayers;
 
     map.setView(property.coords, 14);

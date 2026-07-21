@@ -66,7 +66,9 @@ async function geocodeAddress(address) {
     return {
         coords: [parseFloat(data[0].lat), parseFloat(data[0].lon)],
         displayName: data[0].display_name,
-        addressDebug: data[0].address // временно
+        isoRegion: data[0].address?.["ISO3166-2-lvl4"] || null,
+        county: data[0].address?.county || null,
+        city: data[0].address?.city || data[0].address?.town || null
     };
 }
 
@@ -230,6 +232,65 @@ function convertOverpassElements(elements) {
         .filter(Boolean);
 }
 
+// Проверка попадания текста (county/city) на список ключевых слов —
+// без учёта регистра, по вхождению подстроки (учитывает формы вроде
+// "городской округ Норильск", "Приморский муниципальный округ" и т.д.)
+function textContainsAny(text, keywords) {
+    if (!text) return false;
+    const lower = text.toLowerCase();
+    return keywords.some(kw => lower.includes(kw));
+}
+
+function matchesKeywords(geo, keywords) {
+    return textContainsAny(geo.county, keywords) || textContainsAny(geo.city, keywords);
+}
+
+const SPECIAL_REGIONS_URL = "/static/html/regions.html";
+
+// Правила проверяются по порядку, срабатывает первое совпадение
+const REGIONAL_WARNING_RULES = [
+    // Полностью входящие регионы
+    {
+        match: (geo) => ["RU-MUR", "RU-NEN", "RU-YAN", "RU-CHU", "RU-SA"].includes(geo.isoRegion),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Архангельская область — частично
+    {
+        match: (geo) => geo.isoRegion === "RU-ARK" &&
+            matchesKeywords(geo, ["архангельск", "северодвинск", "новодвинск", "приморск", "лешукон", "пинеж", "онеж", "новая земля"]),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Карелия — частично
+    {
+        match: (geo) => geo.isoRegion === "RU-KR" &&
+            matchesKeywords(geo, ["беломорск", "калевальск", "кемск", "лоухск", "сегежск", "костомукш"]),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Красноярский край — частично
+    {
+        match: (geo) => geo.isoRegion === "RU-KYA" &&
+            matchesKeywords(geo, ["норильск", "таймыр", "туруханск", "эвенкийск"]),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Коми — частично
+    {
+        match: (geo) => geo.isoRegion === "RU-KO" &&
+            matchesKeywords(geo, ["воркута", "инта", "усинск", "усть-цилемск"]),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Ханты-Мансийский АО — частично (Березовский и Белоярский районы)
+    {
+        match: (geo) => geo.isoRegion === "RU-KHM" &&
+            matchesKeywords(geo, ["берёзовск", "березовск", "белоярск"]),
+        articleUrl: SPECIAL_REGIONS_URL
+    }
+];
+
+function getRegionalWarningUrl(geo) {
+    const rule = REGIONAL_WARNING_RULES.find(r => r.match(geo));
+    return rule ? rule.articleUrl : null;
+}
+
 app.get("/api/geo-data", async (req, res) => {
     const address = req.query.address;
 
@@ -252,7 +313,8 @@ app.get("/api/geo-data", async (req, res) => {
 
         const result = {
             property: { coords: geo.coords, address: geo.displayName, addressDebug: geo.addressDebug },
-            problemLayers
+            problemLayers,
+            regionalWarningUrl: getRegionalWarningUrl(geo)
         };
 
         setCache(cacheKey, result);

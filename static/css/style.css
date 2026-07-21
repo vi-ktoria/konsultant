@@ -957,3 +957,20 @@ body.term-popup-open {
         padding: 48px 20px 24px;
     }
 }
+
+/* рег особенности для карты */
+.regional-warning {
+    margin-top: 12px;
+    padding: 10px 15px;
+    background: #fff8e1;
+    border: 1px solid #f9a825;
+    border-radius: 8px;
+    color: #7a5c00;
+    font-size: 14px;
+}
+
+.regional-warning a {
+    color: #7a5c00;
+    font-weight: bold;
+    text-decoration: underline;
+}
