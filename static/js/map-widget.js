@@ -1,17 +1,3 @@
-// widget.js
-//
-// Изменения по сравнению с MVP на статичном problems.json:
-//   1. Точки/полигоны/линии больше не лежат в problems.json — они приходят
-//      с backend'а (см. /backend/server.js), который сам дергает Nominatim
-//      + Overpass API и отдаёт уже готовый набор объектов вокруг адреса.
-//   2. Backend грузит объекты сразу в радиусе 5 км (MAX_RADIUS_M на сервере).
-//      Слайдер радиуса на фронте дальше просто пересчитывает analyze() по
-//      уже загруженным данным — новых запросов к серверу при движении
-//      слайдера не идёт.
-//   3. Добавлен новый тип геометрии "line" (ж/д пути, трассы), которого не
-//      было в исходной версии — там они были искусственно "замкнуты" в
-//      полигон в problems.json.
-
 // Адрес backend. Если разворачиваете backend на другом хосте/порту - поменяйте здесь.
 const BACKEND_URL = "https://konsultant-map-backend.onrender.com";
 
@@ -29,7 +15,7 @@ async function loadGeoData(address) {
     const data = await response.json();
 
     if (!response.ok) {
-        throw new Error(data.error || "Не удалось получить гео-данные");
+        throw new Error(data.error || "Ошибка! Не удалось получить гео-данные, попробуйте снова");
     }
 
     return data; // { property: { coords }, problemLayers: [...] }
@@ -51,7 +37,7 @@ async function initGeoWidget() {
     const address = getAddressFromUrl();
 
     if (!address) {
-        showFatalError("Адрес не указан. Вернитесь на главную страницу и введите адрес.");
+        showFatalError("Ошибка! Адрес не указан. Вернитесь на главную страницу и введите адрес.");
         return;
     }
 
