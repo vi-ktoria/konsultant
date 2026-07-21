@@ -55,12 +55,12 @@ async function geocodeAddress(address) {
 
     const response = await fetch(url, { headers: HEADERS });
     if (!response.ok) {
-        throw new Error(`Nominatim вернул статус ${response.status}`);
+        throw new Error(`Ошибка! Nominatim вернул статус ${response.status}. Повторите попытку через несколько минут`);
     }
 
     const data = await response.json();
     if (!data || data.length === 0) {
-        throw new Error("Адрес не найден");
+        throw new Error("Адрес не найден. Введите корректный адрес объекта и попробуйте снова");
     }
 
     return {
@@ -148,7 +148,7 @@ async function fetchProblemObjects(lat, lon, radius) {
         }
     }
 
-    throw new Error(`все зеркала Overpass недоступны (последняя ошибка: ${lastError.message})`);
+    throw new Error(`Сервис перегружен (последняя ошибка: ${lastError.message}). Попробуйте обновить страницу`);
 }
 
 // Overpass -> формат виджета
@@ -295,7 +295,7 @@ app.get("/api/geo-data", async (req, res) => {
     const address = req.query.address;
 
     if (!address || !address.trim()) {
-        return res.status(400).json({ error: "Не передан адрес" });
+        return res.status(400).json({ error: "Ошибка! Адрес не был передан" });
     }
 
     const cacheKey = address.trim().toLowerCase();
@@ -323,7 +323,7 @@ app.get("/api/geo-data", async (req, res) => {
     } catch (err) {
         console.error(err);
 
-        if (err.message === "Адрес не найден") {
+        if (err.message === "Адрес не найден. Введите корректный адрес объекта и попробуйте снова") {
             return res.status(404).json({ error: err.message });
         }
 
