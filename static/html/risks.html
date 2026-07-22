@@ -5,24 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Риски при покупке квартиры</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components/navbar.css">
+    <link rel="stylesheet" href="../css/components/sidebar.css">
     <link rel="stylesheet" href="../css/risks.css">
     <link rel="stylesheet" href="../css/logo.css">
 </head>
 <body>
-    <header class="navbar">
-        <a class="logo" href="../../index.html" aria-label="Перейти на главную страницу">
-            <img class="logo-image" src="../images/logo.png" alt="Квартира без риска" />
-        </a>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="../../index.html">Главная</a></li>
-                <li><a href="articles.html">Статьи</a></li>
-                <li><a href="../../index.html#templatesSection">Шаблоны документов</a></li>
-                <li><a href="../../index.html#storiesSection">Истории из жизни</a></li>
-                <li><a href="../../index.html#faqSection">Вопросы и ответы</a></li>
-            </ul>
-        </nav>
-    </header>
+    <!-- Контейнер для навбара -->
+    <header id="navbarContainer"></header>
 
     <main class="risks-page">
         <section class="risks-layout">
@@ -40,28 +30,8 @@
 
             </div>
 
-            <aside class="risks-right">
-                <section class="risks-search">
-                    <h4>Поиск по статьям, документам и вопросам</h4>
-                    <div class="search-wrapper">
-                        <input class="search-input" type="text" placeholder="Покупка квартиры" data-search-input data-results="#searchResults">
-                        <div class="search-results" id="searchResults"></div>
-                    </div>
-                </section>
-
-                <section class="risks-start-card">
-                    <h3>С чего начать покупку?</h3>
-                    <a class="instruction-btn" href="start-guide.html">Открыть инструкцию →</a>
-                </section>
-
-                <section class="risks-materials">
-                    <h2>Полезные материалы</h2>
-                    <ul class="nav-list">
-                        <li><a href="regions.html">Региональные особенности →</a></li>
-                        <li><a href="rieltor.html">Как проверить риелтора →</a></li>
-                    </ul>
-                </section>
-            </aside>
+            <!-- Контейнер для правого блока -->
+            <div id="sidebarContainer" class="right-column"></div>
         </section>
     </main>
 
@@ -72,5 +42,7 @@
     <script src="../js/url-params-handler.js"></script>
     <script src="../js/search.js"></script>
     <script src="../js/risks.js"></script>
+    <script src="../js/components/navbar.js"></script>
+    <script src="../js/components/sidebar.js"></script>
 </body>
 </html>
