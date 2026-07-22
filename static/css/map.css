@@ -238,3 +238,14 @@ h2 {
     font-weight: bold;
     text-decoration: underline;
 }
+
+.risk-info-norm {
+    margin-top: 6px !important;
+    font-size: 13px;
+    color: #777;
+}
+
+.risk-info-norm a {
+    color: #2a6fdb;
+    text-decoration: underline;
+}
