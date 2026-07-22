@@ -1,28 +1,11 @@
 window.storiesData = [];
 
 function createStoryExcerpt(html) {
-    const container = document.createElement('div');
-    container.innerHTML = html || '';
+    if (!html) return '';
 
-    const paragraphs = Array.from(container.querySelectorAll('p'));
-
-    const firstTextParagraph = paragraphs.find(function (paragraph) {
-        const text = paragraph.textContent.trim();
-
-        return (
-            text &&
-            text !== 'Истории из жизни' &&
-            !text.startsWith('№') &&
-            !text.startsWith('Источник:') &&
-            !text.startsWith('(гиперссылка:')
-        );
-    });
-
-    if (!firstTextParagraph) {
-        return '';
-    }
-
-    const text = firstTextParagraph.textContent.trim();
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = html;
+    const text = tempDiv.textContent.trim();
 
     if (text.length <= 260) {
         return text;
