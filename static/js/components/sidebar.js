@@ -53,8 +53,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof initSearch === 'function') {
                 initSearch();
             }
+            
         })
         .catch(error => {
             console.error('Ошибка загрузки боковой панели:', error);
         });
+    // После загрузки sidebar
+    if (typeof initSearch === 'function') {
+        initSearch();
+    }
 });

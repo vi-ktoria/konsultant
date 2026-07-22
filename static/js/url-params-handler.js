@@ -58,3 +58,40 @@ async function handleFaqParam(faqSlug) {
 
     targetFaq.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
+document.addEventListener('DOMContentLoaded', function() {
+    // ===== Обработка кликов по ссылкам на истории =====
+    document.querySelectorAll('.story-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const href = this.getAttribute('href');
+            // Извлекаем slug из ссылки
+            const match = href.match(/[?&]story=([^&]+)/);
+            if (match) {
+                const slug = decodeURIComponent(match[1]);
+                openStoryBySlug(slug);
+            }
+        });
+    });
+});
+
+// Функция для открытия истории по slug
+function openStoryBySlug(slug) {
+    if (typeof window.openStoryModal === 'function') {
+        // Ищем историю в загруженных данных
+        const story = window.storiesData?.find(s => s.slug === slug);
+        if (story) {
+            window.openStoryModal(story.id);
+        } else {
+            // Если нет в данных — загружаем по slug через API
+            fetch(`${API_BASE}/stories/${slug}`)
+                .then(r => r.json())
+                .then(story => {
+                    if (window.openStoryModal) {
+                        window.openStoryModal(story.id);
+                    }
+                })
+                .catch(err => console.error('Ошибка загрузки истории:', err));
+        }
+    }
+}

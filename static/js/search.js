@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+function initSearch() {
     const searchInputs = document.querySelectorAll('[data-search-input]');
 
     // Проверяем, находимся ли мы на главной странице
@@ -174,4 +174,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-});
+}
+
+// Автоматическая инициализация при загрузке страницы
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSearch);
+} else {
+    initSearch();
+}

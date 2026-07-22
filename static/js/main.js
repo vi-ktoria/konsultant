@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // ===== Плавный скролл =====
-    const navbarHeight = document.querySelector('.navbar').offsetHeight;
+    const navbar = document.querySelector('.navbar');
+    const navbarHeight = navbar ? navbar.offsetHeight : 0;
 
     function smoothScroll(targetId) {
         const target = document.querySelector(targetId);
