@@ -278,10 +278,9 @@ const REGIONAL_WARNING_RULES = [
             matchesKeywords(geo, ["воркута", "инта", "усинск", "усть-цилемск"]),
         articleUrl: SPECIAL_REGIONS_URL
     },
-    // Ханты-Мансийский АО — частично (Березовский и Белоярский районы)
+    // Ханты-Мансийский АО
     {
-        match: (geo) => geo.isoRegion === "RU-KHM" &&
-            matchesKeywords(geo, ["берёзовск", "березовск", "белоярск"]),
+        match: (geo) => geo.isoRegion === "RU-KHM",
         articleUrl: SPECIAL_REGIONS_URL
     }
 ];
