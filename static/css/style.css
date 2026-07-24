@@ -804,7 +804,14 @@ body.term-popup-open {
     font-weight: 500;
 }
 .faq-answer a,
-.faq-answer a:visited {
+.faq-answer a:visited,
+.term-popup a,
+.term-popup a:visited {
     color: #2563eb;
     text-decoration: none;
+}
+
+.faq-answer a:hover,
+.term-popup a:hover {
+    text-decoration: underline;
 }
