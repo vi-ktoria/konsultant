@@ -161,3 +161,7 @@
         font-size: 20px;
     }
 }
+#termsContent a,
+#termsContent a:visited {
+    color: #0000ee;
+}
