@@ -356,3 +356,6 @@ h2 {
     color: inherit;
     font-weight: 700;
 }
+a:visited {
+    color: blue;
+}

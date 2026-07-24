@@ -470,3 +470,6 @@ html {
         font-size: 27px;
     }
 }
+a:visited {
+    color: blue;
+}
