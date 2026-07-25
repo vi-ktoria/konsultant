@@ -7,11 +7,16 @@ function createStoryExcerpt(html) {
     tempDiv.innerHTML = html;
     const text = tempDiv.textContent.trim();
 
-    if (text.length <= 260) {
-        return text;
-    }
+    const lines = text.split('\n');
+    lines.shift();
 
-    return text.slice(0, 260).trim() + '...';
+    const cleanText = lines.join(' ').trim() || text;
+
+    if (cleanText.length <= 260) {
+        return cleanText + '...';
+    }
+    
+    return cleanText.slice(0, 260).trim() + '...';
 }
 
 async function loadStoriesFromAPI() {
