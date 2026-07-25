@@ -114,6 +114,7 @@ async function initGeoWidget() {
         const ratio = distance / radius; // 0 = вплотную к объекту, 1 = на границе радиуса
 
         if (category === "mfc") return "neutral";
+        if (category === "cemetery") return "yellow";
         if (risk === "high") {
             if (ratio <= 0.5) return "red";
             if (ratio <= 1.2) return "yellow";
