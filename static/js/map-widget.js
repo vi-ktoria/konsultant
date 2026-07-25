@@ -89,7 +89,7 @@ async function initGeoWidget() {
         depot: "medium",
         metro_line: 'medium',
         agriculture: "low",
-        cemetery: "low",
+        cemetery: "medium",
         station: "low",
         metro: 'low',
         unknown: "low"
@@ -105,7 +105,7 @@ async function initGeoWidget() {
     const SEVERITY_LABELS = {
         red: "🔴 Может быть опасно",
         yellow: "🟡 Обратите внимание",
-        green: "🟢 Всё хорошо, но имейте в виду",
+        green: "🟢 Опасности не представляет",
         neutral: "Полезный объект поблизости"
     };
 
@@ -447,9 +447,9 @@ async function initGeoWidget() {
     ];
 
     const GREEN_FORMS = [
-        "объект, который может быть полезен и опасности не представляет",
-        "объекта, которые могут быть полезны и опасности не представляют",
-        "объектов, которые могут быть полезны и опасности не представляют"
+        "объект, который опасности не представляет",
+        "объекта, которые опасности не представляют",
+        "объектов, которые опасности не представляют"
     ];
 
     function renderSummaryText(counts) {
@@ -492,9 +492,9 @@ async function initGeoWidget() {
                 yellow: bySeverity.yellow.length,
                 green: bySeverity.green.length
             }) +
-            renderSeverityGroup("red", bySeverity.red, "🔴 Опасно", SEVERITY_COLORS.red) +
+            renderSeverityGroup("red", bySeverity.red, "🔴 Может быть опасно", SEVERITY_COLORS.red) +
             renderSeverityGroup("yellow", bySeverity.yellow, "🟡 Обратите внимание", SEVERITY_COLORS.yellow) +
-            renderSeverityGroup("green", bySeverity.green, "🟢 Имейте в виду", SEVERITY_COLORS.green);
+            renderSeverityGroup("green", bySeverity.green, "🟢 Опасности не представляет", SEVERITY_COLORS.green);
     }
 
     window.__onPanelToggle = function(key, isOpen) {
