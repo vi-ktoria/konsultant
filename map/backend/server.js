@@ -334,12 +334,40 @@ app.listen(PORT, () => {
     console.log(`GIS backend запущен: http://localhost:${PORT}`);
 });
 
-app.get("/api/debug-overpass", async (req, res) => {
-    try {
-        const r = await fetch("https://overpass-api.de/api/status", { headers: HEADERS });
-        const text = await r.text();
-        res.type("text/plain").send(text);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
+app.get("/api/debug-network", async (req, res) => {
+    const results = {};
+
+    async function check(name, url, options = {}) {
+        const start = Date.now();
+        try {
+            const r = await fetch(url, { headers: HEADERS, ...options });
+            results[name] = {
+                ok: true,
+                status: r.status,
+                ms: Date.now() - start
+            };
+        } catch (err) {
+            results[name] = {
+                ok: false,
+                error: err.message,
+                ms: Date.now() - start
+            };
+        }
     }
+
+    // 1. Работает ли исходящий интернет вообще
+    await check("internet_example.com", "https://example.com");
+
+    // 2. Какой у Render сейчас исходящий IP (полезно понять, забанен ли он конкретно)
+    await check("my_outbound_ip", "https://api.ipify.org?format=json");
+
+    // 3. Nominatim (геокодирование)
+    await check("nominatim", "https://nominatim.openstreetmap.org/status.php");
+
+    // 4. Все три зеркала Overpass
+    await check("overpass_main", "https://overpass-api.de/api/status");
+    await check("overpass_kumi", "https://overpass.kumi.systems/api/status");
+    await check("overpass_private_coffee", "https://overpass.private.coffee/api/status");
+
+    res.json(results);
 });
