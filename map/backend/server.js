@@ -19,10 +19,15 @@ const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 
 // Публичный overpass-api.de часто перегружен и отдаёт 504
 // Пробуем несколько зеркал по очереди, пока одно не ответит
+// const OVERPASS_URLS = [
+//     "https://overpass-api.de/api/interpreter",
+//     "https://overpass.kumi.systems/api/interpreter",
+//     "https://overpass.private.coffee/api/interpreter"
+// ];
 const OVERPASS_URLS = [
-    "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
-    "https://overpass.private.coffee/api/interpreter"
+    "https://overpass.private.coffee/api/interpreter",
+    "https://overpass-api.de/api/interpreter"
 ];
 
 // Nominatim и Overpass требуют указывать нормальный User-Agent
