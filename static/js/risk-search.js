@@ -71,5 +71,5 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    renderHistory();
+    historyList.innerHTML = ''; // список готовим, но не показываем — покажется только по фокусу на поле
 });
