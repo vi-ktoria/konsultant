@@ -39,14 +39,10 @@ app.include_router(search_router, prefix=config.API_PREFIX)
 def root():
     return {"service": "Risk Analyzer API", "version": config.VERSION, "status": "running"}
 
-@app.get("/ping")
-def ping():
-    return {"status": "ok", "message": "pong"}
-
-@app.exception_handler(Exception)
-async def debug_exception_handler(request: Request, exc: Exception):
-    traceback.print_exc()
-    return JSONResponse(
-        status_code=500,
-        content={"detail": str(exc), "type": type(exc).__name__}
-    )
+@app.post("/clear-cache")
+def clear_cache():
+    """Очистка кэша (для администраторов)"""
+    get_all_content_cached.cache_clear()
+    get_content_by_slug_cached.cache_clear()
+    search_content_cached.cache_clear()
+    return {"status": "ok", "message": "Cache cleared"}

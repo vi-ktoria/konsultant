@@ -87,9 +87,6 @@ async function openStoryModal(storyId) {
 
     } catch (error) {
         console.error('Ошибка загрузки истории:', error);
-        modalBody.innerHTML = `
-            <p style="color: #e74c3c;">Не удалось загрузить историю</p>
-        `;
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
 
