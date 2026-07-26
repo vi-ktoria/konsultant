@@ -333,3 +333,13 @@ app.get("/api/geo-data", async (req, res) => {
 app.listen(PORT, () => {
     console.log(`GIS backend запущен: http://localhost:${PORT}`);
 });
+
+app.get("/api/debug-overpass", async (req, res) => {
+    try {
+        const r = await fetch("https://overpass-api.de/api/status", { headers: HEADERS });
+        const text = await r.text();
+        res.type("text/plain").send(text);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
