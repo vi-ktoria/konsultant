@@ -152,14 +152,29 @@ async function fetchProblemObjects(lat, lon, radius) {
     const query = buildOverpassQuery(lat, lon, radius);
 
     let lastError;
+    let lastEmptyResult = null;
 
     for (const url of OVERPASS_URLS) {
         try {
-            return await tryOverpassUrl(url, query, 100000);
+            const elements = await tryOverpassUrl(url, query, 100000);
+
+            if (elements.length > 0) {
+                return elements;
+            }
+
+            console.warn(`${url} вернул 0 элементов, пробую следующее зеркало`);
+            lastEmptyResult = elements;
         } catch (err) {
             console.warn(`Overpass ${url} не ответил: ${err.message}`);
             lastError = err;
         }
+    }
+
+    // если ни одно зеркало не дало объектов, но хотя бы одно честно ответило —
+    // доверяем этому (область действительно может быть пустой)
+    if (lastEmptyResult !== null) {
+        console.warn("Ни одно зеркало не вернуло объектов — вероятно, область пуста");
+        return lastEmptyResult;
     }
 
     throw new Error(`Сервис перегружен (последняя ошибка: ${lastError.message}). Попробуйте обновить страницу`);
