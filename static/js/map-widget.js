@@ -1,5 +1,5 @@
 // Адрес backend. Если разворачиваете backend на другом хосте/порту - поменяйте здесь.
-const BACKEND_URL = "https://bbavjagqd7ghp2p10t6u.containers.yandexcloud.net/";
+const BACKEND_URL = "https://bbavjagqd7ghp2p10t6u.containers.yandexcloud.net";
 
 // вспомогательные функции
 
