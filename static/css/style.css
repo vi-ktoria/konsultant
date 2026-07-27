@@ -547,6 +547,7 @@ h5 {
     position: fixed;
     top: 50%;
     left: 50%;
+    color: #1a3a4a;
 
     width: min(720px, calc(100vw - 32px));
     max-height: 80vh;
