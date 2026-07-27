@@ -3,6 +3,16 @@
 // запрашивает проблемные объекты вокруг точки (Overpass API) и отдаёт
 // фронтенду единый JSON в формате { property, problemLayers }.
 
+const fs = require("fs");
+const path = require("path");
+
+let fallbackCache = {};
+try {
+    fallbackCache = JSON.parse(fs.readFileSync(path.join(__dirname, "fallback-cache.json"), "utf-8"));
+    console.log(`Fallback-кэш загружен: ${Object.keys(fallbackCache).length} адресов`);
+} catch (err) {
+    console.error(err);
+}
 
 const express = require("express");
 const cors = require("cors");
@@ -19,16 +29,16 @@ const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 
 // Публичный overpass-api.de часто перегружен и отдаёт 504
 // Пробуем несколько зеркал по очереди, пока одно не ответит
-// const OVERPASS_URLS = [
-//     "https://overpass-api.de/api/interpreter",
-//     "https://overpass.kumi.systems/api/interpreter",
-//     "https://overpass.private.coffee/api/interpreter"
-// ];
 const OVERPASS_URLS = [
+    "https://overpass-api.de/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
-    "https://overpass.private.coffee/api/interpreter",
-    "https://overpass-api.de/api/interpreter"
+    "https://overpass.private.coffee/api/interpreter"
 ];
+// const OVERPASS_URLS = [
+//     "https://overpass.kumi.systems/api/interpreter",
+//     "https://overpass.private.coffee/api/interpreter",
+//     "https://overpass-api.de/api/interpreter"
+// ];
 
 // Nominatim и Overpass требуют указывать нормальный User-Agent
 const HEADERS = {
@@ -301,12 +311,20 @@ app.get("/api/geo-data", async (req, res) => {
     if (!address || !address.trim()) {
         return res.status(400).json({ error: "Ошибка! Адрес не был передан" });
     }
-
+    // === кэш
     const cacheKey = address.trim().toLowerCase();
-    const cached = getFromCache(cacheKey);
-    if (cached) {
-        return res.json(cached);
+
+    if (fallbackCache[cacheKey]) {
+        return res.json(fallbackCache[cacheKey]);
     }
+
+    const cached = getFromCache(cacheKey);
+    // ===
+    // const cacheKey = address.trim().toLowerCase();
+    // const cached = getFromCache(cacheKey);
+    // if (cached) {
+    //     return res.json(cached);
+    // }
 
     try {
         const geo = await geocodeAddress(address);
