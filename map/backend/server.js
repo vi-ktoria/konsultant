@@ -6,11 +6,6 @@
 const fs = require("fs");
 const path = require("path");
 
-const cachePath = path.join(__dirname, "fallback-cache.json");
-console.log(__dirname);
-console.log(cachePath);
-console.log(fs.existsSync(cachePath));
-
 let fallbackCache = {};
 try {
     fallbackCache = JSON.parse(fs.readFileSync(path.join(__dirname, "fallback-cache.json"), "utf-8"));
