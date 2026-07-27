@@ -1,6 +1,5 @@
 // Разовый скрипт: прогоняет список демо-адресов через Overpass
 // с увеличенным таймаутом и сохраняет результат в fallback-cache.json.
-// Запускать ЛОКАЛЬНО (node generate-fallback.js), не на Render.
 
 const fs = require("fs");
 const path = require("path");
@@ -15,8 +14,13 @@ const OVERPASS_URLS = [
 const HEADERS = { "User-Agent": "gis-risk-widget-mvp/1.0 (student project, contact: none)" };
 const MAX_RADIUS_M = 2500;
 
-// ⚠ впиши сюда реальные адреса, которые будешь показывать на защите
+// адреса для кэша
 const DEMO_ADDRESSES = [
+    "Москва, Верхние поля 33",
+    "Москва, Тихвинская 17",
+    "Москва, Тверская 1",
+    "Москва, Кржижановского 6",
+    "Мурманск, Капитана Орликовой, 53",
     "Мурманск, Победы, 21"
 ];
 
@@ -89,8 +93,6 @@ async function fetchWithLongTimeout(lat, lon, radius) {
     throw new Error("Ни одно зеркало не ответило за 100 секунд");
 }
 
-// === скопируй сюда convertOverpassElements, convertElement, detectCategory,
-//     CATEGORY_LABELS, isLineCategory из server.js без изменений ===
 const CATEGORY_LABELS = {
     industry_zone: "Промышленная зона",
     waste: "Полигон ТБО",
@@ -167,8 +169,62 @@ function convertOverpassElements(elements) {
         .filter(Boolean);
 }
 
+function textContainsAny(text, keywords) {
+    if (!text) return false;
+    const lower = text.toLowerCase();
+    return keywords.some(kw => lower.includes(kw));
+}
+
+function matchesKeywords(geo, keywords) {
+    return textContainsAny(geo.county, keywords) || textContainsAny(geo.city, keywords);
+}
+
+const SPECIAL_REGIONS_URL = "/static/html/regions.html";
+
+// Правила проверяются по порядку, срабатывает первое совпадение
+const REGIONAL_WARNING_RULES = [
+    // Полностью входящие регионы
+    {
+        match: (geo) => ["RU-MUR", "RU-NEN", "RU-YAN", "RU-CHU", "RU-SA"].includes(geo.isoRegion),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Архангельская область — частично
+    {
+        match: (geo) => geo.isoRegion === "RU-ARK" &&
+            matchesKeywords(geo, ["архангельск", "северодвинск", "новодвинск", "приморск", "лешукон", "пинеж", "онеж", "новая земля"]),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Карелия — частично
+    {
+        match: (geo) => geo.isoRegion === "RU-KR" &&
+            matchesKeywords(geo, ["беломорск", "калевальск", "кемск", "лоухск", "сегежск", "костомукш"]),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Красноярский край — частично
+    {
+        match: (geo) => geo.isoRegion === "RU-KYA" &&
+            matchesKeywords(geo, ["норильск", "таймыр", "туруханск", "эвенкийск"]),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Коми — частично
+    {
+        match: (geo) => geo.isoRegion === "RU-KO" &&
+            matchesKeywords(geo, ["воркута", "инта", "усинск", "усть-цилемск"]),
+        articleUrl: SPECIAL_REGIONS_URL
+    },
+    // Ханты-Мансийский АО
+    {
+        match: (geo) => geo.isoRegion === "RU-KHM",
+        articleUrl: SPECIAL_REGIONS_URL
+    }
+];
+
+function getRegionalWarningUrl(geo) {
+    const rule = REGIONAL_WARNING_RULES.find(r => r.match(geo));
+    return rule ? rule.articleUrl : null;
+}
+
 async function main() {
-    //const result = {};
     const cachePath = path.join(__dirname, "fallback-cache.json");
 
     let result = {};
@@ -200,7 +256,8 @@ async function main() {
 
             result[address.trim().toLowerCase()] = {
                 property: { coords: geo.coords, address: geo.displayName },
-                problemLayers
+                problemLayers,
+                regionalWarningUrl: getRegionalWarningUrl(geo)
             };
             console.log(`Успех для "${address}", объектов: ${problemLayers.length}`);
         } catch (err) {

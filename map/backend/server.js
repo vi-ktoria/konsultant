@@ -31,6 +31,7 @@ const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 // Пробуем несколько зеркал по очереди, пока одно не ответит
 const OVERPASS_URLS = [
     "https://overpass-api.de/api/interpreter",
+    "https://overpass.osm.ch/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
     "https://overpass.private.coffee/api/interpreter"
 ];
