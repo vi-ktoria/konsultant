@@ -3,6 +3,16 @@
 // запрашивает проблемные объекты вокруг точки (Overpass API) и отдаёт
 // фронтенду единый JSON в формате { property, problemLayers }.
 
+const fs = require("fs");
+const path = require("path");
+
+let fallbackCache = {};
+try {
+    fallbackCache = JSON.parse(fs.readFileSync(path.join(__dirname, "fallback-cache.json"), "utf-8"));
+    console.log(`Fallback-кэш загружен: ${Object.keys(fallbackCache).length} адресов`);
+} catch {
+    console.warn("fallback-cache.json не найден");
+}
 
 const express = require("express");
 const cors = require("cors");
@@ -301,12 +311,20 @@ app.get("/api/geo-data", async (req, res) => {
     if (!address || !address.trim()) {
         return res.status(400).json({ error: "Ошибка! Адрес не был передан" });
     }
-
+    // === кэш
     const cacheKey = address.trim().toLowerCase();
-    const cached = getFromCache(cacheKey);
-    if (cached) {
-        return res.json(cached);
+
+    if (fallbackCache[cacheKey]) {
+        return res.json(fallbackCache[cacheKey]);
     }
+
+    const cached = getFromCache(cacheKey);
+    // ===
+    // const cacheKey = address.trim().toLowerCase();
+    // const cached = getFromCache(cacheKey);
+    // if (cached) {
+    //     return res.json(cached);
+    // }
 
     try {
         const geo = await geocodeAddress(address);
