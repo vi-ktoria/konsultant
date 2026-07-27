@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>GIS Widget</title>
 
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/components/navbar.css">
+    <link rel="stylesheet" href="../css/logo.css" />
     <link rel="stylesheet" href="../css/map.css">
 
     <!-- Leaflet -->
@@ -14,102 +17,109 @@
     <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 
     <script src="../js/map-widget.js" defer></script>
+    <script src="../js/components/navbar.js"></script>
 </head>
 
 <body>
 
-<h2>Гео-аналитика недвижимости</h2>
+<header id="navbarContainer"></header>
 
-<div id="widget-layout">
+<main class="map-page">
+    <div class="map-content">
+        <h2>Гео-аналитика недвижимости</h2>
 
-    <div id="left-column">
-        <h4 id="property-address-display"></h4>
-        <div id="map"></div>
+        <div id="widget-layout">
 
-        <div id="regional-warning-container"></div>
-        
-        <div id="radius-control">
-            <label for="radius-slider">
-                Радиус поиска:
-                <span id="radius-value">500</span>
-            </label>
+            <div id="left-column">
+                <h4 id="property-address-display"></h4>
+                <div id="map"></div>
 
-            <input
-                type="range"
-                id="radius-slider"
-                min="50"
-                max="2500"
-                step="50"
-                value="1000">
-        </div>
+                <div id="regional-warning-container"></div>
+                
+                <div id="radius-control">
+                    <label for="radius-slider">
+                        Радиус поиска:
+                        <span id="radius-value">500</span>
+                    </label>
 
-        <div id="risk-info">
-            <details ontoggle="if (this.open) this.scrollIntoView({ behavior: 'smooth', block: 'start' })">
-                <summary>Почему некоторые объекты могут вызывать проблемы?</summary>
-                <div class="risk-info-content">
-
-                    <div class="risk-info-item">
-                        <strong>🏭 Промышленная зона / завод</strong>
-                        <p>Выбросы в воздух, шум от работы оборудования, специфический запах, риск загрязнения почвы и грунтовых вод.</p>
-                        <p class="risk-info-norm">Норматив: от 50 до 1000 м до жилых объектов в зависимости от класса опасности предприятия. <a href="https://clck.ru/3Uu7wZ" target="_blank" rel="noopener">Постановление Главного санитарного врача РФ №74</a></p>
-                    </div>
-
-                    <div class="risk-info-item">
-                        <strong>🗑 Полигон ТБО / свалка</strong>
-                        <p>Неприятный запах, риск загрязнения грунтовых вод, привлекает грызунов и птиц, повышенный риск возгораний.</p>
-                        <p class="risk-info-norm">Норматив: не менее 500 м от жилой застройки. <a href="https://clck.ru/3UuATV" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03</a></p>
-                    </div>
-
-                    <div class="risk-info-item">
-                        <strong>🚆 Железная дорога</strong>
-                        <p>Шум и вибрация от проходящих составов, особенно в ночное время, задержки на переездах.</p>
-                        <p class="risk-info-norm">Норматив: не менее 100 м до жилых объектов от оси крайнего пути (50 м при наличии шумозащитных экранов). <a href="https://clck.ru/3UuATV" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03</a></p>
-                    </div>
-
-                    <div class="risk-info-item">
-                        <strong>🛣 Автомагистраль</strong>
-                        <p>Постоянный шум от трафика, загрязнение воздуха выхлопными газами, вибрация от тяжёлого транспорта.</p>
-                        <p class="risk-info-norm">Норматив: не менее 100 м (дороги I–III категории) или 50 м (IV категория) до жилых объектов. <a href="https://clck.ru/3UtMMH" target="_blank" rel="noopener">СП 42.13330.2026</a></p>
-                    </div>
-
-                    <div class="risk-info-item">
-                        <strong>⚰ Кладбище</strong>
-                        <p>Санитарные ограничения на застройку поблизости, дискомфорт для части покупателей.</p>
-                        <p class="risk-info-norm">Норматив: от 50 до 500 м до жилых объектов в зависимости от размера кладбища; не менее 1000 м от водозаборов. <a href="https://clck.ru/3UuA2y" target="_blank" rel="noopener">СанПиН 2.1.3684-21, п. 52</a></p>
-                    </div>
-
-                    <div class="risk-info-item">
-                        <strong>✈ Аэропорт</strong>
-                        <p>Сильный шум от самолётов, ограничения на высотное строительство поблизости, слив керосина.</p>
-                        <p class="risk-info-norm">Норматив: устанавливается индивидуально — по расчётам рассеивания загрязнений, уровня шума/вибрации и оценке риска для здоровья. <a href="https://clck.ru/3UuNCf" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03, п. 2.9</a></p>
-                    </div>
-
-                    <div class="risk-info-item">
-                        <strong>🚉 Депо / электродепо</strong>
-                        <p>Шум маневровых работ и техобслуживания составов, движение техники в любое время суток.</p>
-                        <p class="risk-info-norm">Норматив: не менее 100 м от границы территории депо до жилой застройки (величина может уточняться по факту выбросов и шума). <a href="https://clck.ru/3UuNH7" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03</a></p>
-                    </div>
-
-                    <div class="risk-info-item">
-                        <strong>🚇 Линия метро (наземный участок)</strong>
-                        <p>Шум и вибрация от проходящих составов на открытых участках линии.</p>
-                        <p class="risk-info-norm">Норматив: не менее 50–100 м до жилых объектов при отсутствии шумозащитных экранов, из расчёта непревышения ПДУ шума. <a href="https://clck.ru/3UuN5m" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03, п. 2.6</a></p>
-                    </div>
-
+                    <input
+                        type="range"
+                        id="radius-slider"
+                        min="50"
+                        max="2500"
+                        step="50"
+                        value="1000">
                 </div>
-            </details>
+
+                <div id="risk-info">
+                    <details ontoggle="if (this.open) this.scrollIntoView({ behavior: 'smooth', block: 'start' })">
+                        <summary>Почему некоторые объекты могут вызывать проблемы?</summary>
+                        <div class="risk-info-content">
+
+                            <div class="risk-info-item">
+                                <strong>🏭 Промышленная зона / завод</strong>
+                                <p>Выбросы в воздух, шум от работы оборудования, специфический запах, риск загрязнения почвы и грунтовых вод.</p>
+                                <p class="risk-info-norm">Норматив: от 50 до 1000 м до жилых объектов в зависимости от класса опасности предприятия. <a href="https://clck.ru/3Uu7wZ" target="_blank" rel="noopener">Постановление Главного санитарного врача РФ №74</a></p>
+                            </div>
+
+                            <div class="risk-info-item">
+                                <strong>🗑 Полигон ТБО / свалка</strong>
+                                <p>Неприятный запах, риск загрязнения грунтовых вод, привлекает грызунов и птиц, повышенный риск возгораний.</p>
+                                <p class="risk-info-norm">Норматив: не менее 500 м от жилой застройки. <a href="https://clck.ru/3UuATV" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03</a></p>
+                            </div>
+
+                            <div class="risk-info-item">
+                                <strong>🚆 Железная дорога</strong>
+                                <p>Шум и вибрация от проходящих составов, особенно в ночное время, задержки на переездах.</p>
+                                <p class="risk-info-norm">Норматив: не менее 100 м до жилых объектов от оси крайнего пути (50 м при наличии шумозащитных экранов). <a href="https://clck.ru/3UuATV" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03</a></p>
+                            </div>
+
+                            <div class="risk-info-item">
+                                <strong>🛣 Автомагистраль</strong>
+                                <p>Постоянный шум от трафика, загрязнение воздуха выхлопными газами, вибрация от тяжёлого транспорта.</p>
+                                <p class="risk-info-norm">Норматив: не менее 100 м (дороги I–III категории) или 50 м (IV категория) до жилых объектов. <a href="https://clck.ru/3UtMMH" target="_blank" rel="noopener">СП 42.13330.2026</a></p>
+                            </div>
+
+                            <div class="risk-info-item">
+                                <strong>⚰ Кладбище</strong>
+                                <p>Санитарные ограничения на застройку поблизости, дискомфорт для части покупателей.</p>
+                                <p class="risk-info-norm">Норматив: от 50 до 500 м до жилых объектов в зависимости от размера кладбища; не менее 1000 м от водозаборов. <a href="https://clck.ru/3UuA2y" target="_blank" rel="noopener">СанПиН 2.1.3684-21, п. 52</a></p>
+                            </div>
+
+                            <div class="risk-info-item">
+                                <strong>✈ Аэропорт</strong>
+                                <p>Сильный шум от самолётов, ограничения на высотное строительство поблизости, слив керосина.</p>
+                                <p class="risk-info-norm">Норматив: устанавливается индивидуально — по расчётам рассеивания загрязнений, уровня шума/вибрации и оценке риска для здоровья. <a href="https://clck.ru/3UuNCf" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03, п. 2.9</a></p>
+                            </div>
+
+                            <div class="risk-info-item">
+                                <strong>🚉 Депо / электродепо</strong>
+                                <p>Шум маневровых работ и техобслуживания составов, движение техники в любое время суток.</p>
+                                <p class="risk-info-norm">Норматив: не менее 100 м от границы территории депо до жилой застройки (величина может уточняться по факту выбросов и шума). <a href="https://clck.ru/3UuNH7" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03</a></p>
+                            </div>
+
+                            <div class="risk-info-item">
+                                <strong>🚇 Линия метро (наземный участок)</strong>
+                                <p>Шум и вибрация от проходящих составов на открытых участках линии.</p>
+                                <p class="risk-info-norm">Норматив: не менее 50–100 м до жилых объектов при отсутствии шумозащитных экранов, из расчёта непревышения ПДУ шума. <a href="https://clck.ru/3UuN5m" target="_blank" rel="noopener">СанПиН 2.2.1/2.1.1.1200-03, п. 2.6</a></p>
+                            </div>
+
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+
+            <div id="analysis-panel">
+                <h3>Результаты анализа</h3>
+                <div id="analysis-content">
+                    Анализ не выполнен
+                </div>
+            </div>
+
         </div>
-
     </div>
-
-    <div id="analysis-panel">
-        <h3>Результаты анализа</h3>
-        <div id="analysis-content">
-            Анализ не выполнен
-        </div>
-    </div>
-
-</div>
+</main>
 
 </body>
 </html>

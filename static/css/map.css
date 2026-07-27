@@ -1,12 +1,6 @@
 body {
-    font-family: Arial, sans-serif;
     margin: 0;
-    padding: 30px;
-    background: #f2f4f8;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding: 0;
 }
 
 /* заголовок */
@@ -60,6 +54,22 @@ h2 {
 }
 
 /* ---------- контейнер-строка: слева карта+слайдер, справа панель ---------- */
+.map-page {
+    padding: 40px 32px;
+    width: 100%;
+    min-height: calc(100vh - 80px);
+}
+
+.map-content {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #widget-layout {
     display: flex;
     flex-direction: row;
@@ -76,6 +86,7 @@ h2 {
 #map {
     width: 100%;
     height: 500px;
+    background: #f2f4f8;
 
     border-radius: 16px;
     overflow: hidden;
