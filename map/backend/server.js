@@ -6,12 +6,17 @@
 const fs = require("fs");
 const path = require("path");
 
+const cachePath = path.join(__dirname, "fallback-cache.json");
+console.log(__dirname);
+console.log(cachePath);
+console.log(fs.existsSync(cachePath));
+
 let fallbackCache = {};
 try {
     fallbackCache = JSON.parse(fs.readFileSync(path.join(__dirname, "fallback-cache.json"), "utf-8"));
     console.log(`Fallback-кэш загружен: ${Object.keys(fallbackCache).length} адресов`);
-} catch {
-    console.warn("fallback-cache.json не найден");
+} catch (err) {
+    console.error(err);
 }
 
 const express = require("express");
