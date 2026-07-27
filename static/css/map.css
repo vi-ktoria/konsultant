@@ -58,6 +58,8 @@ h2 {
     padding: 40px 32px;
     width: 100%;
     min-height: calc(100vh - 80px);
+    position: relative;
+    z-index: 1;
 }
 
 .map-content {

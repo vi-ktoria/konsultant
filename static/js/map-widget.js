@@ -157,7 +157,7 @@ async function initGeoWidget() {
         document.getElementById("regional-warning-container").innerHTML = `
             <div class="regional-warning">
                 ⚠ В данном регионе процесс покупки недвижимости имеет особенности.
-                <a href="${geoData.regionalWarningUrl}" target="_blank">Подробнее</a>
+                <a href="${geoData.regionalWarningUrl}" target="_self">Подробнее</a>
             </div>
         `;
     }
