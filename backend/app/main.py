@@ -13,6 +13,8 @@ from .routers import (
 )
 from .config import config
 
+PORT = int(os.getenv("PORT", 10000))
+
 app = FastAPI(
     title="Risk Analyzer API",
     version=config.VERSION,
