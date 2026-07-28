@@ -64,6 +64,7 @@ function addDisclaimer() {
     const heroSection = document.querySelector('.article-hero');
     const titleElement = document.getElementById('articleTitle');
     const disclaimer = document.createElement('p');
+    disclaimer.style.fontSize = '16px';
     disclaimer.textContent = 'Информация носит справочный характер и не заменяет консультацию юриста.';
     titleElement.after(disclaimer);
 }

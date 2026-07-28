@@ -63,7 +63,8 @@ function addDisclaimer() {
   const descriptionElement = document.getElementById('articleDescription');
   const disclaimer = document.createElement('p');
   disclaimer.className = 'article-subtext';
-  disclaimer.textContent = '\n\nИнформация носит справочный характер и не заменяет консультацию юриста.';
+  disclaimer.style.fontSize = '16px';
+  disclaimer.textContent = 'Информация носит справочный характер и не заменяет консультацию юриста.';
   descriptionElement.after(disclaimer);
 }
 

@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function addDisclaimer() {
         const disclaimer = document.createElement('p');
-        disclaimer.style.cssText = 'margin-top: 15px;';
+        disclaimer.style.cssText = 'margin-top: 15px; font-size: 16px;';
         disclaimer.textContent = 'Информация носит справочный характер и не заменяет консультацию юриста.';
         descriptionElement.after(disclaimer);
     }
