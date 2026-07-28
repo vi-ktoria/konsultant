@@ -72,6 +72,6 @@ jobs:
           revision-concurrency: 8
           revision-image-url: cr.yandex/${{ env.CR_REGISTRY }}/${{ env.CR_REPOSITORY }}:${{ github.sha }}
           revision-execution-timeout: 10
-          revision-environment-variables: |
+          revision-env: |
             SUPABASE_URL=${{ secrets.SUPABASE_URL }}
             SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
