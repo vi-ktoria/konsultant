@@ -31,6 +31,7 @@ const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 // Пробуем несколько зеркал по очереди, пока одно не ответит
 const OVERPASS_URLS = [
     "https://overpass-api.de/api/interpreter",
+    "https://overpass.osm.ch/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
     "https://overpass.private.coffee/api/interpreter"
 ];
@@ -47,7 +48,7 @@ const HEADERS = {
 
 // Простой in-memory кэш
 const cache = new Map();
-const CACHE_TTL_MS = 10 * 60 * 1000; // 10 минут
+const CACHE_TTL_MS = 20 * 60 * 1000; // 10 минут
 
 function getFromCache(key) {
     const entry = cache.get(key);
@@ -91,7 +92,7 @@ async function geocodeAddress(address) {
 function buildOverpassQuery(lat, lon, radius) {
     // around:radius,lat,lon — геопоиск в радиусе (в метрах) от точки
     return `
-            [out:json][timeout:25];
+            [out:json][timeout:100];
             (
             way["landuse"~"^(industrial|landfill|farmland|farmyard|railway|cemetery)$"](around:${radius},${lat},${lon});
             node["landuse"="landfill"](around:${radius},${lat},${lon});
@@ -151,16 +152,29 @@ async function fetchProblemObjects(lat, lon, radius) {
     const query = buildOverpassQuery(lat, lon, radius);
 
     let lastError;
+    let lastEmptyResult = null;
 
     for (const url of OVERPASS_URLS) {
-        for (let attempt = 1; attempt <= 2; attempt++) {
-            try {
-                return await tryOverpassUrl(url, query, 35000);
-            } catch (err) {
-                console.warn(`Overpass ${url} попытка ${attempt} не удалась: ${err.message}`);
-                lastError = err;
+        try {
+            const elements = await tryOverpassUrl(url, query, 100000);
+
+            if (elements.length > 0) {
+                return elements;
             }
+
+            console.warn(`${url} вернул 0 элементов, пробую следующее зеркало`);
+            lastEmptyResult = elements;
+        } catch (err) {
+            console.warn(`Overpass ${url} не ответил: ${err.message}`);
+            lastError = err;
         }
+    }
+
+    // если ни одно зеркало не дало объектов, но хотя бы одно честно ответило —
+    // доверяем этому (область действительно может быть пустой)
+    if (lastEmptyResult !== null) {
+        console.warn("Ни одно зеркало не вернуло объектов — вероятно, область пуста");
+        return lastEmptyResult;
     }
 
     throw new Error(`Сервис перегружен (последняя ошибка: ${lastError.message}). Попробуйте обновить страницу`);
