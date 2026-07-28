@@ -6,7 +6,8 @@ on:
       - main
 
 jobs:
-  deploy:
+  # ===== ФРОНТЕНД  =====
+  deploy-frontend:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -33,3 +34,44 @@ jobs:
           aws s3 cp ./index.html s3://${{ secrets.YANDEX_CLOUD_BUCKET_NAME }}/index.html \
             --endpoint-url https://storage.yandexcloud.net \
             --content-type "text/html"
+
+  # ===== БЭКЕНД =====
+  deploy-backend:
+    runs-on: ubuntu-latest
+    needs: deploy-frontend  # ждёт, пока фронтенд загрузится
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Yandex Cloud Container Registry
+        id: login-cr
+        uses: yc-actions/yc-cr-login@v1
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+
+      - name: Build, tag, and push image
+        env:
+          CR_REGISTRY: crpokfqrd165pm6tr6fh
+          CR_REPOSITORY: konsultant-backend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG ./backend
+          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
+
+
+      - name: Deploy Serverless Container
+        uses: yc-actions/yc-sls-container-deploy@v4
+        with:
+          yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
+          container-name: konsultant-backend
+          folder-id: b1gm9akp2k348nms8uhh
+          revision-service-account-id: aje8keutp10h2ru99ogm
+          revision-cores: 1
+          revision-memory: 512Mb
+          revision-core-fraction: 100
+          revision-concurrency: 8
+          revision-image-url: cr.yandex/${{ env.CR_REGISTRY }}/${{ env.CR_REPOSITORY }}:${{ github.sha }}
+          revision-execution-timeout: 10
+          revision-environment-variables: |
+            SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+            SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
