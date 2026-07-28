@@ -6,7 +6,29 @@ document.addEventListener('DOMContentLoaded', function () {
     const contentElement = document.getElementById('articleContent');
     const contentsBlock = document.getElementById('articleContentsBlock');
     const contentsContainer = document.getElementById('articleContents');
+    const dateBlock = document.getElementById('actualDateBlock');
+    const dateElement = document.getElementById('actualDate');
 
+    function showActualDate() {
+        if (!dateBlock || !dateElement) {
+            return;
+        }
+
+        const currentDate = new Date();
+
+        dateElement.textContent = currentDate.toLocaleDateString('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+
+        dateElement.setAttribute(
+            'datetime',
+            currentDate.toISOString().slice(0, 10)
+        );
+
+        dateBlock.hidden = false;
+    }
     if (!titleElement || !descriptionElement || !contentElement) {
         console.error('На странице нет нужных блоков для вывода статьи.');
         return;
@@ -34,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
             document.title = data.title || 'С чего начать покупку';
             titleElement.textContent = data.title || 'С чего начать покупку';
             descriptionElement.textContent = data.short_description || '';
-
+            showActualDate();
             // Рендерим содержимое
             contentElement.innerHTML = data.content || '<p>Текст инструкции пока не добавлен.</p>';
 

@@ -1,6 +1,28 @@
 const params = new URLSearchParams(window.location.search);
 const ARTICLE_SLUG = params.get('slug');
+function showActualDate() {
+    const dateBlock = document.getElementById('actualDateBlock');
+    const dateElement = document.getElementById('actualDate');
 
+    if (!dateBlock || !dateElement) {
+        return;
+    }
+
+    const currentDate = new Date();
+
+    dateElement.textContent = currentDate.toLocaleDateString('ru-RU', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
+
+    dateElement.setAttribute(
+        'datetime',
+        currentDate.toISOString().slice(0, 10)
+    );
+
+    dateBlock.hidden = false;
+}
 function renderArticleContents(contents) {
     const contentsBlock = document.getElementById('articleContentsBlock');
     const contentsContainer = document.getElementById('articleContents');
@@ -70,6 +92,7 @@ async function loadRiskFromAPI() {
         document.title = data.title || 'Риск';
         titleElement.textContent = data.title || 'Без названия';
         descriptionElement.textContent = data.short_description || '';
+        showActualDate();
 
         const temporaryContainer = document.createElement('div');
         temporaryContainer.innerHTML = data.content || '<p>Текст риска пока не добавлен.</p>';
