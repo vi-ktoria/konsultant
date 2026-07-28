@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Query
-from ..crud import search_content_cached
+from ..crud import search_content_with_rank_cached
 from ..models import SearchResult
 
 router = APIRouter(prefix="/search", tags=["search"])
@@ -11,4 +11,4 @@ def search(
     type: str = Query(None, description="Фильтр по типу")
 ):
     """Поиск по материалам (кэшируется)"""
-    return search_content_cached(q, limit, type)
+    return search_content_with_rank_cached(q, limit, type)
