@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  # ===== ФРОНТЕНД =====
+  # ===== ФРОНТЕНД  =====
   deploy-frontend:
     runs-on: ubuntu-latest
     steps:
