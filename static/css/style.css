@@ -605,36 +605,6 @@ h5 {
 body.term-popup-open {
     overflow: hidden;
 }
-/* ===== Футер ===== */
-.site-footer {
-    margin-top: 60px;
-    padding: 32px 20px 24px;
-    text-align: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    background-color: rgba(255, 255, 255, 0.3);
-    border-radius: 16px;
-}
-
-.footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    color: #1a3a4a;
-    font-size: 14px;
-}
-
-.footer-links a {
-    color: #1a3a4a;
-    font-size: 14px;
-    transition: color 0.2s ease;
-}
-
-.footer-links a:hover {
-    color: #2563EB;
-    text-decoration: underline;
-}
 
 @media (max-width: 768px) {
     .two-columns {

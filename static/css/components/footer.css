@@ -1,0 +1,49 @@
+/* ===== Футер ===== */
+.site-footer {
+    margin-top: 60px;
+    padding: 20px 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.footer-copy {
+    font-size: 14px;
+    color: #1a3a4a;
+    opacity: 0.6;
+    margin: 0;
+}
+
+.footer-links {
+    font-size: 14px;
+    color: #1a3a4a;
+    opacity: 0.6;
+}
+
+.footer-links a {
+    color: #1a3a4a;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: #2563EB;
+}
+
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 8px;
+    }
+}
