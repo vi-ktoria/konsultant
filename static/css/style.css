@@ -645,7 +645,11 @@ body.term-popup-open {
 
 .actual-date {
     margin-top: 15px;
-    font-size: 17px;
+    font-size: 18px;
+    font-family: inherit;
+    color: inherit;
+    font-weight: inherit;
+    line-height: inherit;
 }
 
 @media (max-width: 768px) {
