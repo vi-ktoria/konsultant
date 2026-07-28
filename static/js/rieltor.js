@@ -1,4 +1,5 @@
 const ARTICLE_SLUG = 'kak-proverit-rieltora-pered-pokupkoi-kvartiry-poshagovaya-instruktsiya';
+
 function showActualDate() {
   const dateBlock = document.getElementById('actualDateBlock');
   const dateElement = document.getElementById('actualDate');
@@ -22,6 +23,7 @@ function showActualDate() {
 
   dateBlock.hidden = false;
 }
+
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
   const contentsContainer = document.getElementById('articleContents');
@@ -57,10 +59,17 @@ function renderArticleContents(contents) {
   contentsBlock.style.display = 'block';
 }
 
+function addDisclaimer() {
+  const descriptionElement = document.getElementById('articleDescription');
+  const disclaimer = document.createElement('p');
+  disclaimer.className = 'article-subtext';
+  disclaimer.textContent = 'Информация носит справочный характер и не заменяет консультацию юриста.';
+  descriptionElement.after(disclaimer);
+}
+
 async function loadRiskArticleFromDatabase() {
   const titleElement = document.getElementById('articleTitle');
   const descriptionElement = document.getElementById('articleDescription');
-  showActualDate();
   const contentElement = document.getElementById('articleContent');
 
   if (!titleElement || !descriptionElement || !contentElement) {
@@ -87,6 +96,8 @@ async function loadRiskArticleFromDatabase() {
 
   titleElement.textContent = data.title || 'Без названия';
   descriptionElement.textContent = data.short_description || '';
+  showActualDate();
+  addDisclaimer();
   contentElement.innerHTML = data.content || '<p>Текст статьи пока не добавлен.</p>';
 
   renderArticleContents(data.contents);

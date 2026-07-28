@@ -1,5 +1,6 @@
 const params = new URLSearchParams(window.location.search);
 const ARTICLE_SLUG = params.get('slug');
+
 function showActualDate() {
     const dateBlock = document.getElementById('actualDateBlock');
     const dateElement = document.getElementById('actualDate');
@@ -23,6 +24,7 @@ function showActualDate() {
 
     dateBlock.hidden = false;
 }
+
 function renderArticleContents(contents) {
     const contentsBlock = document.getElementById('articleContentsBlock');
     const contentsContainer = document.getElementById('articleContents');
@@ -56,6 +58,13 @@ function renderArticleContents(contents) {
     }).join('');
 
     contentsBlock.style.display = 'block';
+}
+
+function addDisclaimer() {
+    const titleElement = document.getElementById('articleTitle');
+    const disclaimer = document.createElement('p');
+    disclaimer.textContent = 'Информация носит справочный характер и не заменяет консультацию юриста.';
+    titleElement.after(disclaimer);
 }
 
 async function loadRiskFromAPI() {
@@ -93,6 +102,7 @@ async function loadRiskFromAPI() {
         titleElement.textContent = data.title || 'Без названия';
         descriptionElement.textContent = data.short_description || '';
         showActualDate();
+        addDisclaimer();
 
         const temporaryContainer = document.createElement('div');
         temporaryContainer.innerHTML = data.content || '<p>Текст риска пока не добавлен.</p>';

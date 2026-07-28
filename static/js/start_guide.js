@@ -29,6 +29,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         dateBlock.hidden = false;
     }
+
+    function addDisclaimer() {
+        const disclaimer = document.createElement('p');
+        disclaimer.textContent = '\nИнформация носит справочный характер и не заменяет консультацию юриста.';
+        descriptionElement.after(disclaimer);
+    }
+
     if (!titleElement || !descriptionElement || !contentElement) {
         console.error('На странице нет нужных блоков для вывода статьи.');
         return;
@@ -57,10 +64,10 @@ document.addEventListener('DOMContentLoaded', function () {
             titleElement.textContent = data.title || 'С чего начать покупку';
             descriptionElement.textContent = data.short_description || '';
             showActualDate();
-            // Рендерим содержимое
+            addDisclaimer();
+
             contentElement.innerHTML = data.content || '<p>Текст инструкции пока не добавлен.</p>';
 
-            // Рендерим содержание (оглавление)
             renderArticleContents(data.contents);
 
         } catch (error) {
