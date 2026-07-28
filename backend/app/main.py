@@ -1,5 +1,6 @@
 import os
 import traceback
+from mangum import Mangum
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +13,7 @@ from .routers import (
     search_router
 )
 from .config import config
+from .crud import get_all_content_cached, get_content_by_slug_cached, search_content_cached
 
 PORT = int(os.getenv("PORT", 10000))
 
@@ -21,7 +23,6 @@ app = FastAPI(
     description="API для анализа рисков при покупке недвижимости"
 )
 
-# вот тут разрешить только с нашего
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.getenv("ALLOWED_ORIGINS", "").split(","),
@@ -52,3 +53,6 @@ def clear_cache():
     get_content_by_slug_cached.cache_clear()
     search_content_cached.cache_clear()
     return {"status": "ok", "message": "Cache cleared"}
+
+# ===== ТОЧКА ВХОДА ДЛЯ CLOUD FUNCTIONS =====
+handler = Mangum(app)
