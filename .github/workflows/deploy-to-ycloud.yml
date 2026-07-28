@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  # ===== ФРОНТЕНД  =====
+  # ===== ФРОНТЕНД =====
   deploy-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -38,7 +38,10 @@ jobs:
   # ===== БЭКЕНД =====
   deploy-backend:
     runs-on: ubuntu-latest
-    needs: deploy-frontend  # ждёт, пока фронтенд загрузится
+    needs: deploy-frontend
+    env:
+      CR_REGISTRY: crpokfqrd165pm6tr6fh
+      CR_REPOSITORY: konsultant-backend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,14 +53,9 @@ jobs:
           yc-sa-json-credentials: ${{ secrets.YC_SA_JSON_CREDENTIALS }}
 
       - name: Build, tag, and push image
-        env:
-          CR_REGISTRY: crpokfqrd165pm6tr6fh
-          CR_REPOSITORY: konsultant-backend
-          IMAGE_TAG: ${{ github.sha }}
         run: |
-          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG ./backend
-          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:$IMAGE_TAG
-
+          docker build -t cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:${{ github.sha }} ./backend
+          docker push cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:${{ github.sha }}
 
       - name: Deploy Serverless Container
         uses: yc-actions/yc-sls-container-deploy@v4
@@ -70,7 +68,7 @@ jobs:
           revision-memory: 512Mb
           revision-core-fraction: 100
           revision-concurrency: 8
-          revision-image-url: cr.yandex/${{ env.CR_REGISTRY }}/${{ env.CR_REPOSITORY }}:${{ github.sha }}
+          revision-image-url: cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:${{ github.sha }}
           revision-execution-timeout: 10
           revision-env: |
             SUPABASE_URL=${{ secrets.SUPABASE_URL }}
