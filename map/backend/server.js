@@ -129,12 +129,6 @@ async function tryOverpassUrl(url, query, timeoutMs) {
         }
 
         const data = await response.json();
-
-        if (data.remark) {
-            console.warn("Overpass remark (вероятная ошибка в запросе):", data.remark);
-        }
-        console.log(`Overpass вернул элементов: ${(data.elements || []).length}`);
-
         return data.elements || [];
 
     } finally {
@@ -151,26 +145,26 @@ async function fetchProblemObjects(lat, lon, radius) {
     for (const url of OVERPASS_URLS) {
         try {
             const elements = await tryOverpassUrl(url, query, 100000);
+            console.log(`Overpass: зеркало ${url} успешно ОТВЕТИЛО, кол-во объектов: ${elements.length}`);
 
             if (elements.length > 0) {
+                console.log(`Запрос обработан УСПЕШНО, кол-во объектов: ${elements.length}`);
                 return elements;
             }
 
-            console.warn(`${url} вернул 0 элементов, пробую следующее зеркало`);
             lastEmptyResult = elements;
         } catch (err) {
-            console.warn(`Overpass ${url} не ответил: ${err.message}`);
+            console.log(`Overpass: зеркало ${url} не ответило (${err.message})`);
             lastError = err;
         }
     }
 
-    // если ни одно зеркало не дало объектов, но хотя бы одно честно ответило —
-    // доверяем этому (область действительно может быть пустой)
     if (lastEmptyResult !== null) {
-        console.warn("Ни одно зеркало не вернуло объектов — вероятно, область пуста");
+        console.log("Overpass: ни одно зеркало не вернуло объекты");
         return lastEmptyResult;
     }
 
+    console.log("Overpass: ни одно зеркало не вернуло объекты");
     throw new Error(`Сервис перегружен (последняя ошибка: ${lastError.message}). Попробуйте обновить страницу`);
 }
 
@@ -315,7 +309,8 @@ function getRegionalWarningUrl(geo) {
 
 app.get("/api/geo-data", async (req, res) => {
     const address = req.query.address;
-
+    console.log(`Запрос для адреса: ${address}`);
+    
     if (!address || !address.trim()) {
         return res.status(400).json({ error: "Ошибка! Адрес не был передан" });
     }
