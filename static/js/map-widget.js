@@ -483,7 +483,7 @@ async function initGeoWidget() {
         window.__currentPanelData = bySeverity;
 
         if (inRadius.length === 0) {
-            panel.innerHTML = `<div class="safe">✔ В выбранном радиусе объектов не найдено.</div>`;
+            panel.innerHTML = `<div class="safe">В выбранном радиусе достоверных размеченных объектов не найдено.</div>`;
             return;
         }
 
