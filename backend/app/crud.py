@@ -4,7 +4,7 @@ from .models import ContentItemBase
 
 def get_all_content(limit: int = 100, content_type: str = None):
     query = supabase.table("content_items")\
-        .select("id, type, slug, title, short_description, content, category, tags, created_at")\
+        .select("id, type, slug, title, short_description, content, category, contents, tags, created_at")\
         .eq("is_published", True)\
         .order("id", desc=True)
     
@@ -20,7 +20,7 @@ def get_all_content_cached(limit: int = 100, content_type: str = None):
 
 def get_content_by_slug(slug: str):
     result = supabase.table("content_items")\
-        .select("id, type, slug, title, short_description, content, category, tags, created_at")\
+        .select("id, type, slug, title, short_description, content, category, contents, tags, created_at")\
         .eq("slug", slug)\
         .eq("is_published", True)\
         .execute()
