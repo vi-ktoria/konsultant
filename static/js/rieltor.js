@@ -1,5 +1,27 @@
 const ARTICLE_SLUG = 'kak-proverit-rieltora-pered-pokupkoi-kvartiry-poshagovaya-instruktsiya';
+function showActualDate() {
+  const dateBlock = document.getElementById('actualDateBlock');
+  const dateElement = document.getElementById('actualDate');
 
+  if (!dateBlock || !dateElement) {
+    return;
+  }
+
+  const currentDate = new Date();
+
+  dateElement.textContent = currentDate.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  dateElement.setAttribute(
+    'datetime',
+    currentDate.toISOString().slice(0, 10)
+  );
+
+  dateBlock.hidden = false;
+}
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
   const contentsContainer = document.getElementById('articleContents');
@@ -38,6 +60,7 @@ function renderArticleContents(contents) {
 async function loadRiskArticleFromDatabase() {
   const titleElement = document.getElementById('articleTitle');
   const descriptionElement = document.getElementById('articleDescription');
+  showActualDate();
   const contentElement = document.getElementById('articleContent');
 
   if (!titleElement || !descriptionElement || !contentElement) {

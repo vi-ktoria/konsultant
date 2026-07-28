@@ -1,5 +1,27 @@
 const ARTICLE_SLUG = 'osobennosti-pokupki-nedvizhimosti-v-regionakh';
+function showActualDate() {
+  const dateBlock = document.getElementById('actualDateBlock');
+  const dateElement = document.getElementById('actualDate');
 
+  if (!dateBlock || !dateElement) {
+    return;
+  }
+
+  const currentDate = new Date();
+
+  dateElement.textContent = currentDate.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  dateElement.setAttribute(
+    'datetime',
+    currentDate.toISOString().slice(0, 10)
+  );
+
+  dateBlock.hidden = false;
+}
 function renderArticleContents(contents) {
   const contentsBlock = document.getElementById('articleContentsBlock');
   const contentsContainer = document.getElementById('articleContents');
@@ -64,6 +86,7 @@ async function loadRiskArticleFromDatabase() {
 
   titleElement.textContent = data.title || 'Без названия';
   descriptionElement.textContent = data.short_description || '';
+  showActualDate();
   contentElement.innerHTML = data.content || '<p>Текст статьи пока не добавлен.</p>';
 
   renderArticleContents(data.contents);
