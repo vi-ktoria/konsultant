@@ -27,19 +27,13 @@ const MAX_RADIUS_M = 2500;
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 
-// Публичный overpass-api.de часто перегружен и отдаёт 504
 // Пробуем несколько зеркал по очереди, пока одно не ответит
 const OVERPASS_URLS = [
+    "https://overpass.private.coffee/api/interpreter",
     "https://overpass-api.de/api/interpreter",
     "https://overpass.osm.ch/api/interpreter",
     "https://overpass.kumi.systems/api/interpreter",
-    "https://overpass.private.coffee/api/interpreter"
 ];
-// const OVERPASS_URLS = [
-//     "https://overpass.kumi.systems/api/interpreter",
-//     "https://overpass.private.coffee/api/interpreter",
-//     "https://overpass-api.de/api/interpreter"
-// ];
 
 // Nominatim и Overpass требуют указывать нормальный User-Agent
 const HEADERS = {
@@ -48,7 +42,7 @@ const HEADERS = {
 
 // Простой in-memory кэш
 const cache = new Map();
-const CACHE_TTL_MS = 20 * 60 * 1000; // 10 минут
+const CACHE_TTL_MS = 30 * 60 * 1000; // 30 минут
 
 function getFromCache(key) {
     const entry = cache.get(key);
@@ -333,12 +327,9 @@ app.get("/api/geo-data", async (req, res) => {
     }
 
     const cached = getFromCache(cacheKey);
-    // ===
-    // const cacheKey = address.trim().toLowerCase();
-    // const cached = getFromCache(cacheKey);
-    // if (cached) {
-    //     return res.json(cached);
-    // }
+    if (cached) {
+        return res.json(cached);
+    }
 
     try {
         const geo = await geocodeAddress(address);
