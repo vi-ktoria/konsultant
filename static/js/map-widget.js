@@ -483,7 +483,11 @@ async function initGeoWidget() {
         window.__currentPanelData = bySeverity;
 
         if (inRadius.length === 0) {
-            panel.innerHTML = `<div class="safe">В выбранном радиусе достоверных размеченных объектов не найдено.</div>`;
+            if (problemLayers.length === 0) {
+                panel.innerHTML = `<div class="warning">⚠ Проблема на стороне Overpass, объекты не загружены. Попробуйте обновить страницу.</div>`;
+            } else {
+                panel.innerHTML = `<div class="safe">В выбранном радиусе достоверных размеченных объектов не найдено.</div>`;
+            }
             return;
         }
 

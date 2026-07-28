@@ -344,7 +344,9 @@ app.get("/api/geo-data", async (req, res) => {
             regionalWarningUrl: getRegionalWarningUrl(geo)
         };
 
-        setCache(cacheKey, result);
+        if (problemLayers.length > 0) {
+            setCache(cacheKey, result);
+        }
         res.json(result);
 
     } catch (err) {
