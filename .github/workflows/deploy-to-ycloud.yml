@@ -68,7 +68,7 @@ jobs:
           revision-memory: 512Mb
           revision-core-fraction: 100
           revision-concurrency: 8
-          revision-image-url: cr.yandex/$CR_REGISTRY/$CR_REPOSITORY:${{ github.sha }}
+          revision-image-url: cr.yandex/crpokfqrd165pm6tr6fh/konsultant-backend:${{ github.sha }}
           revision-execution-timeout: 10
           revision-env: |
             SUPABASE_URL=${{ secrets.SUPABASE_URL }}
