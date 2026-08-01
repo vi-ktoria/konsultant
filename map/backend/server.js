@@ -1,8 +1,3 @@
-
-// Принимает адрес, геокодирует его (Nominatim),
-// запрашивает проблемные объекты вокруг точки (Overpass API) и отдаёт
-// фронтенду единый JSON в формате { property, problemLayers }.
-
 const fs = require("fs");
 const path = require("path");
 
@@ -22,12 +17,10 @@ app.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
-// Максимальный радиус, на который грузим объекты за один запрос
 const MAX_RADIUS_M = 2500;
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 
-// Пробуем несколько зеркал по очереди, пока одно не ответит
 const OVERPASS_URLS = [
     "https://overpass.private.coffee/api/interpreter",
     "https://overpass-api.de/api/interpreter",
@@ -35,14 +28,12 @@ const OVERPASS_URLS = [
     "https://overpass.kumi.systems/api/interpreter",
 ];
 
-// Nominatim и Overpass требуют указывать нормальный User-Agent
 const HEADERS = {
     "User-Agent": "gis-risk-widget-mvp/1.0 (student project, contact: none)"
 };
 
-// Простой in-memory кэш
 const cache = new Map();
-const CACHE_TTL_MS = 30 * 60 * 1000; // 30 минут
+const CACHE_TTL_MS = 30 * 60 * 1000;
 
 function getFromCache(key) {
     const entry = cache.get(key);
@@ -58,9 +49,7 @@ function setCache(key, data) {
     cache.set(key, { data, time: Date.now() });
 }
 
-// ГЕОКОДИРОВАНИЕ
 async function geocodeAddress(address) {
-    // const url = `${NOMINATIM_URL}?format=json&countrycodes=ru&q=${encodeURIComponent(address)}`;
     const url = `${NOMINATIM_URL}?format=json&addressdetails=1&countrycodes=ru&q=${encodeURIComponent(address)}`;
 
     const response = await fetch(url, { headers: HEADERS });
@@ -82,9 +71,7 @@ async function geocodeAddress(address) {
     };
 }
 
-// OVERPASS
 function buildOverpassQuery(lat, lon, radius) {
-    // around:radius,lat,lon — геопоиск в радиусе (в метрах) от точки
     return `
             [out:json][timeout:100];
             (
@@ -102,12 +89,6 @@ function buildOverpassQuery(lat, lon, radius) {
             out geom;
         `;
 }
-
-// МФЦ
-// way["government"="multifunctional_centre"](around:${radius},${lat},${lon});
-// node["government"="multifunctional_centre"](around:${radius},${lat},${lon});
-// way["office"="government"](around:${radius},${lat},${lon});
-// node["office"="government"](around:${radius},${lat},${lon});
 
 async function tryOverpassUrl(url, query, timeoutMs) {
     const controller = new AbortController();
@@ -168,7 +149,6 @@ async function fetchProblemObjects(lat, lon, radius) {
     throw new Error(`Сервис перегружен (последняя ошибка: ${lastError.message}). Попробуйте обновить страницу`);
 }
 
-// Overpass -> формат виджета
 
 const CATEGORY_LABELS = {
     industry_zone: "Промышленная зона",
@@ -189,8 +169,6 @@ function detectCategory(tags) {
     if (tags.landuse === "industrial" || tags.man_made === "works") return "industry_zone";
     if (tags.landuse === "landfill") return "waste";
     if (tags.aeroway === "aerodrome") return "airport";
-    // важно проверить railway=station ДО общей проверки на railway,
-    // иначе вокзалы попадут в категорию "железная дорога"
     if (tags.railway === "depot" || tags.landuse === "railway") return "depot";
     if (tags.railway === "station" && tags.station === "subway") return "metro";
     if (tags.railway === "station") return "station";
@@ -203,9 +181,6 @@ function detectCategory(tags) {
     return "unknown";
 }
 
-// Линии (ж/д пути, трассы) — открытая геометрия.
-// Всё остальное (промзоны, ТБО, с/х, аэропорты, вокзалы, кладбища) —
-// площадные объекты (полигоны) либо точки, если так в OSM.
 function isLineCategory(category) {
     return category === "railway" || category === "road";
 }
@@ -217,7 +192,6 @@ function convertElement(el) {
 
     const name = tags.name || CATEGORY_LABELS[category] || "Объект";
 
-    // node (точка) — geometry нет, есть lat/lon напрямую
     if (el.type === "node") {
         return {
             type: "point",
@@ -227,7 +201,6 @@ function convertElement(el) {
         };
     }
 
-    // way (линия/полигон) — geometry это массив {lat, lon}
     if (el.type === "way" && Array.isArray(el.geometry)) {
         const coords = el.geometry.map(pt => [pt.lat, pt.lon]);
         if (coords.length < 2) return null;
@@ -249,9 +222,6 @@ function convertOverpassElements(elements) {
         .filter(Boolean);
 }
 
-// Проверка попадания текста (county/city) на список ключевых слов —
-// без учёта регистра, по вхождению подстроки (учитывает формы вроде
-// "городской округ Норильск", "Приморский муниципальный округ" и т.д.)
 function textContainsAny(text, keywords) {
     if (!text) return false;
     const lower = text.toLowerCase();
@@ -264,7 +234,6 @@ function matchesKeywords(geo, keywords) {
 
 const SPECIAL_REGIONS_URL = "/static/html/regions.html";
 
-// Правила проверяются по порядку, срабатывает первое совпадение
 const REGIONAL_WARNING_RULES = [
     // Полностью входящие регионы
     {
@@ -314,7 +283,6 @@ app.get("/api/geo-data", async (req, res) => {
     if (!address || !address.trim()) {
         return res.status(400).json({ error: "Ошибка! Адрес не был передан" });
     }
-    // === кэш
     const cacheKey = address.trim().toLowerCase();
 
     if (fallbackCache[cacheKey]) {
@@ -380,16 +348,9 @@ app.get("/api/debug-network", async (req, res) => {
         }
     }
 
-    // 1. Работает ли исходящий интернет вообще
     await check("internet_example.com", "https://example.com");
-
-    // 2. Какой у Render сейчас исходящий IP (полезно понять, забанен ли он конкретно)
     await check("my_outbound_ip", "https://api.ipify.org?format=json");
-
-    // 3. Nominatim (геокодирование)
     await check("nominatim", "https://nominatim.openstreetmap.org/status.php");
-
-    // 4. Все три зеркала Overpass
     await check("overpass_main", "https://overpass-api.de/api/status");
     await check("overpass_kumi", "https://overpass.kumi.systems/api/status");
     await check("overpass_private_coffee", "https://overpass.private.coffee/api/status");

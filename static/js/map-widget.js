@@ -1,7 +1,5 @@
-// Адрес backend. Если разворачиваете backend на другом хосте/порту - поменяйте здесь.
+// адрес backend
 const BACKEND_URL = "https://bbavjagqd7ghp2p10t6u.containers.yandexcloud.net";
-
-// вспомогательные функции
 
 function getAddressFromUrl() {
     const params = new URLSearchParams(window.location.search);
@@ -18,7 +16,7 @@ async function loadGeoData(address) {
         throw new Error(data.error || "Ошибка! Не удалось получить гео-данные, попробуйте снова");
     }
 
-    return data; // { property: { coords }, problemLayers: [...] }
+    return data; 
 }
 
 function showFatalError(message) {
@@ -31,7 +29,6 @@ function showFatalError(message) {
     }
 }
 
-// main функция
 async function initGeoWidget() {
 
     const address = getAddressFromUrl();
@@ -46,8 +43,6 @@ async function initGeoWidget() {
         panel.innerHTML = `<div>⏳ Ищем объекты поблизости... это может занять несколько минут.</div>`;
     }
 
-    // ДАННЫЕ (грузим ДО создания карты — если backend недоступен,
-    // не хотим создавать Leaflet-объект, который потом придётся ломать)
     let geoData;
     try {
         geoData = await loadGeoData(address);
@@ -57,7 +52,6 @@ async function initGeoWidget() {
         return;
     }
 
-    // КАРТА
     const map = L.map('map').setView([55.7558, 37.6176], 11);
     map.attributionControl.setPrefix(false);
 
@@ -111,7 +105,7 @@ async function initGeoWidget() {
 
     function getSeverity(category, distance, radius) {
         const risk = CATEGORY_RISK[category] || "low";
-        const ratio = distance / radius; // 0 = вплотную к объекту, 1 = на границе радиуса
+        const ratio = distance / radius;
 
         if (category === "mfc") return "neutral";
         if (category === "cemetery") return "yellow";
@@ -127,7 +121,6 @@ async function initGeoWidget() {
             return "green";
         }
 
-        // low risk — красным никогда не подсвечиваем
         return ratio <= 0.2 ? "yellow" : "green";
     }
 
@@ -149,7 +142,6 @@ async function initGeoWidget() {
     };
     console.log("geoData.property:", geoData.property);
 
-    // вывод адреса
     document.getElementById("property-address-display").textContent = `📍 ${property.address}`;
 
     // рег особенности
@@ -178,7 +170,6 @@ async function initGeoWidget() {
 
     const resultLayer = L.layerGroup().addTo(map);
 
-    // ЗАМЫКАНИЕ ПОЛИГОНА
     function closePolygon(coords) {
         const first = coords[0];
         const last = coords[coords.length - 1];
@@ -190,19 +181,16 @@ async function initGeoWidget() {
         return coords;
     }
 
-    // ЕДИНИЦЫ ИЗМЕРЕНИЯ РАДИУСА
     function formatRadius(radius) {
         return radius >= 1000
             ? (radius / 1000).toFixed(1) + " км"
             : radius + " м";
     }
 
-    // АНАЛИЗ РИСКОВ
     function analyze(property, layers) {
-        // Переводим центр недвижимости в формат Turf: [Lng, Lat]
+        // переводим центр недвижимости в формат Turf: [Lng, Lat]
         const propertyLngLat = [property.coords[1], property.coords[0]];
 
-        // Создаем буферную зону (круг) вокруг недвижимости через Turf
         const circle = turf.circle(propertyLngLat, property.radius / 1000, {
             units: "kilometers"
         });
@@ -210,7 +198,6 @@ async function initGeoWidget() {
         return layers.map(layer => {
             let distance = null;
 
-            // ТОЧКИ
             if (layer.type === "point") {
                 const pointLngLat = [layer.coords[1], layer.coords[0]];
 
@@ -223,7 +210,6 @@ async function initGeoWidget() {
                 distance = Math.round(dist);
             }
 
-            // ПОЛИГОНЫ
             if (layer.type === "polygon") {
                 const invertedCoords = layer.coords.map(coord => [coord[1], coord[0]]);
                 const fixedCoords = closePolygon(invertedCoords);
@@ -251,8 +237,6 @@ async function initGeoWidget() {
                 }
             }
 
-            // ЛИНИИ (ж/д пути, трассы) — открытая геометрия, без замыкания
-            // и без проверки "точка внутри", в отличие от полигонов
             if (layer.type === "line") {
                 const invertedCoords = layer.coords.map(coord => [coord[1], coord[0]]);
 
@@ -280,7 +264,6 @@ async function initGeoWidget() {
         });
     }
 
-    // ОТРИСОВКА СЛОЁВ
     function drawBaseLayers(layers) {
 
         layers.forEach(layer => {
@@ -311,7 +294,6 @@ async function initGeoWidget() {
         });
     }
 
-    // ОТРИСОВКА РЕЗУЛЬТАТОВ
     function renderResults(layers) {
 
         resultLayer.clearLayers();
@@ -334,7 +316,6 @@ async function initGeoWidget() {
                 `);
             }
 
-            // ПОЛИГОНЫ
             if (layer.type === "polygon") {
                 L.polygon(layer.coords, {
                     color: SEVERITY_COLORS[layer.severity],
@@ -349,7 +330,6 @@ async function initGeoWidget() {
                 `);
             }
 
-            // ЛИНИИ
             if (layer.type === "line") {
                 L.polyline(layer.coords, {
                     color: SEVERITY_COLORS[layer.severity],
@@ -386,7 +366,6 @@ async function initGeoWidget() {
         `).join("");
     }
 
-    // сколько объектов показываем в каждой категории до кнопки "показать ещё"
     const PANEL_PAGE_SIZE = 30;
     const panelPageState = { red: PANEL_PAGE_SIZE, yellow: PANEL_PAGE_SIZE, green: PANEL_PAGE_SIZE };
     const panelOpenState = { red: true, yellow: false, green: false };
@@ -479,7 +458,6 @@ async function initGeoWidget() {
             green: inRadius.filter(l => l.severity === "green")
         };
 
-        // сохраняем ссылку на текущий набор, чтобы "показать ещё" знал, что рисовать
         window.__currentPanelData = bySeverity;
 
         if (inRadius.length === 0) {
@@ -506,7 +484,6 @@ async function initGeoWidget() {
         panelOpenState[key] = isOpen;
     };
 
-    // ЗАПУСК
     drawBaseLayers(problemLayers);
 
     const analyzed = analyze(property, problemLayers);
@@ -528,7 +505,6 @@ async function initGeoWidget() {
 
     renderAnalysisPanel(analyzed);
 
-    // ИЗМЕНЕНИЕ РАДИУСА
     const slider = document.getElementById("radius-slider");
     const radiusValue = document.getElementById("radius-value");
 
@@ -541,11 +517,8 @@ async function initGeoWidget() {
 
         radiusValue.textContent = formatRadius(property.radius);
 
-        // изменяем круг
         radiusCircle.setRadius(property.radius);
 
-        // пересчитываем результаты по уже загруженным данным,
-        // без нового запроса к backend
         const analyzed = analyze(property, problemLayers);
 
         renderResults(analyzed);
@@ -555,5 +528,4 @@ async function initGeoWidget() {
 
 }
 
-// старт
 window.addEventListener('load', initGeoWidget);

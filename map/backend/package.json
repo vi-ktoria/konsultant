@@ -1,7 +1,7 @@
 {
   "name": "gis-risk-backend",
   "version": "1.0.0",
-  "description": "Backend MVP: геокодирование адреса + получение проблемных объектов вокруг него через Overpass API",
+  "description": "Backend MVP: геокодирование адреса и получение проблемных объектов вокруг него через Overpass API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

@@ -1,5 +1,5 @@
-// Разовый скрипт: прогоняет список демо-адресов через Overpass
-// с увеличенным таймаутом и сохраняет результат в fallback-cache.json.
+// скрипт кэширует демо адреса, посылая запросы в overpass с увеличенным таймаутом, и
+// сохраняет результат в fallback-cache.json.
 
 const fs = require("fs");
 const path = require("path");
@@ -20,8 +20,8 @@ const DEMO_ADDRESSES = [
     "Москва, Тихвинская 17",
     "Москва, Тверская 1",
     "Москва, Кржижановского 6",
-    "Мурманск, Капитана Орликовой, 53",
-    "Мурманск, Победы, 21"
+    "Мурманск, Капитана Орликовой 53",
+    "Мурманск, Победы 21"
 ];
 
 async function geocodeAddress(address) {
@@ -38,7 +38,6 @@ async function geocodeAddress(address) {
 }
 
 function buildQuery(lat, lon, radius) {
-     // around:radius,lat,lon — геопоиск в радиусе (в метрах) от точки
     return `
             [out:json][timeout:100];
             (
@@ -85,7 +84,6 @@ async function fetchWithLongTimeout(lat, lon, radius) {
                 return elements;
             }
             console.warn(`${url}: вернул 0 объектов`);
-            //return await tryOverpass(url, query, 100000); // увеличенный таймаут — только для локальной генерации
         } catch (err) {
             console.warn(`${url} не ответил: ${err.message}`);
         }
@@ -112,8 +110,6 @@ function detectCategory(tags) {
     if (tags.landuse === "industrial" || tags.man_made === "works") return "industry_zone";
     if (tags.landuse === "landfill") return "waste";
     if (tags.aeroway === "aerodrome") return "airport";
-    // важно проверить railway=station ДО общей проверки на railway,
-    // иначе вокзалы попадут в категорию "железная дорога"
     if (tags.railway === "depot" || tags.landuse === "railway") return "depot";
     if (tags.railway === "station" && tags.station === "subway") return "metro";
     if (tags.railway === "station") return "station";
@@ -137,7 +133,6 @@ function convertElement(el) {
 
     const name = tags.name || CATEGORY_LABELS[category] || "Объект";
 
-    // node (точка) — geometry нет, есть lat/lon напрямую
     if (el.type === "node") {
         return {
             type: "point",
@@ -147,7 +142,6 @@ function convertElement(el) {
         };
     }
 
-    // way (линия/полигон) — geometry это массив {lat, lon}
     if (el.type === "way" && Array.isArray(el.geometry)) {
         const coords = el.geometry.map(pt => [pt.lat, pt.lon]);
         if (coords.length < 2) return null;
@@ -181,7 +175,6 @@ function matchesKeywords(geo, keywords) {
 
 const SPECIAL_REGIONS_URL = "/static/html/regions.html";
 
-// Правила проверяются по порядку, срабатывает первое совпадение
 const REGIONAL_WARNING_RULES = [
     // Полностью входящие регионы
     {

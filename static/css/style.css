@@ -533,7 +533,6 @@ h5 {
     border: none;
     border-radius: 8px;
 }
-/* Термин, по которому открывается пояснение */
 
 .term-explanation {
     display: inline;
@@ -561,8 +560,6 @@ h5 {
     border-radius: 3px;
 }
 
-
-/* Затемнение страницы */
 
 .term-popup-overlay {
     position: fixed;
