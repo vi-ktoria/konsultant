@@ -13,35 +13,25 @@ async function loadTemplate() {
         return;
     }
 
-    if (typeof supabaseClient === 'undefined') {
-        console.error('Supabase-клиент не подключён');
-        showError('Не удалось подключиться к базе данных');
+    if (typeof API_BASE === 'undefined') {
+        console.error('API_BASE не определён. Проверьте config.js');
+        showError('Не удалось подключиться к серверу');
         return;
     }
 
     downloadBtn.disabled = true;
 
     try {
-        const { data: template, error } = await supabaseClient
-            .from('document_templates')
-            .select(`
-                slug,
-                title,
-                download_file_url,
-                download_filename
-            `)
-            .eq('slug', slug)
-            .eq('is_published', true)
-            .maybeSingle();
+        const response = await fetch(`${API_BASE}/templates/${slug}`);
 
-        if (error) {
-            throw error;
+        if (!response.ok) {
+            if (response.status === 404) {
+                throw new Error('Документ не найден');
+            }
+            throw new Error(`Ошибка HTTP: ${response.status}`);
         }
 
-        if (!template) {
-            showError('Документ не найден');
-            return;
-        }
+        const template = await response.json();
 
         if (!template.download_file_url) {
             showError('Файл документа не добавлен');
@@ -63,52 +53,52 @@ async function loadTemplate() {
         });
     } catch (error) {
         console.error('Ошибка загрузки документа:', error);
-        showError('Не удалось загрузить документ');
+        showError(error.message || 'Не удалось загрузить документ');
     }
 
     async function renderDocument(fileUrl) {
-    const separator = fileUrl.includes('?') ? '&' : '?';
-    const freshFileUrl = `${fileUrl}${separator}v=${Date.now()}`;
+        const separator = fileUrl.includes('?') ? '&' : '?';
+        const freshFileUrl = `${fileUrl}${separator}v=${Date.now()}`;
 
-    const response = await fetch(freshFileUrl, {
-        cache: 'no-store'
-    });
+        const response = await fetch(freshFileUrl, {
+            cache: 'no-store'
+        });
 
-    if (!response.ok) {
-        throw new Error(
-            `Файл не загрузился. Код ответа: ${response.status}`
-        );
+        if (!response.ok) {
+            throw new Error(
+                `Файл не загрузился. Код ответа: ${response.status}`
+            );
+        }
+
+        const blob = await response.blob();
+
+        console.log('Тип файла:', blob.type);
+        console.log('Размер файла:', blob.size);
+        console.log('Адрес файла:', freshFileUrl);
+
+        if (blob.size === 0) {
+            throw new Error('Получен пустой файл');
+        }
+
+        container.innerHTML = '';
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'docx-wrapper';
+
+        container.appendChild(wrapper);
+
+        try {
+            await docx.renderAsync(blob, wrapper);
+        } catch (renderError) {
+            console.error('Ошибка docx-preview:', renderError);
+
+            throw new Error(
+                `Не удалось разобрать DOCX: ${
+                    renderError.message || String(renderError)
+                }`
+            );
+        }
     }
-
-    const blob = await response.blob();
-
-    console.log('Тип файла:', blob.type);
-    console.log('Размер файла:', blob.size);
-    console.log('Адрес файла:', freshFileUrl);
-
-    if (blob.size === 0) {
-        throw new Error('Получен пустой файл');
-    }
-
-    container.innerHTML = '';
-
-    const wrapper = document.createElement('div');
-    wrapper.className = 'docx-wrapper';
-
-    container.appendChild(wrapper);
-
-    try {
-        await docx.renderAsync(blob, wrapper);
-    } catch (renderError) {
-        console.error('Ошибка docx-preview:', renderError);
-
-        throw new Error(
-            `Не удалось разобрать DOCX: ${
-                renderError.message || String(renderError)
-            }`
-        );
-    }
-}
 
     async function downloadDocument(fileUrl, filename) {
         const originalText = downloadBtn.textContent;
@@ -151,7 +141,7 @@ async function loadTemplate() {
 
         container.innerHTML = `
             <div class="loading">
-                ❌ ${message}
+                ${message}
             </div>
         `;
 

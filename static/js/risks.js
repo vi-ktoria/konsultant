@@ -20,7 +20,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         const risks = await response.json();
 
-        // Сортируем по id (или created_at) — от меньшего к большему
         risks.sort((a, b) => (a.id || 0) - (b.id || 0));
 
         console.log('Получено рисков:', risks.length);
@@ -34,10 +33,8 @@ document.addEventListener('DOMContentLoaded', async function() {
             return;
         }
 
-        // Очищаем контейнер
         container.innerHTML = '';
 
-        // Рендерим риски из API
         risks.forEach(risk => {
             const details = document.createElement('details');
             details.className = 'risks-card';
@@ -61,7 +58,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             container.appendChild(details);
         });
 
-        // Аккордеон — только один открытый
         const riskCards = document.querySelectorAll('.risks-card');
         riskCards.forEach((card) => {
             card.addEventListener('toggle', () => {
@@ -79,7 +75,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         console.error('Ошибка загрузки рисков:', error);
         container.innerHTML = `
             <p style="text-align: center; padding: 40px; color: #e74c3c;">
-                ❌ Не удалось загрузить риски: ${error.message}
+                Не удалось загрузить риски: ${error.message}
             </p>
         `;
     }

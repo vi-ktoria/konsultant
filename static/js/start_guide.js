@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
             titleElement.textContent = 'Инструкция не найдена';
             descriptionElement.textContent = '';
             contentElement.innerHTML = `
-                <p style="color: #e74c3c;">❌ ${error.message}</p>
+                <p style="color: #e74c3c;">${error.message}</p>
                 <p><a href="../../index.html">Вернуться на главную</a></p>
             `;
         }

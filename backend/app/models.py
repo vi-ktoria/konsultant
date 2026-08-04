@@ -30,7 +30,7 @@ class SearchResult(BaseModel):
     short_description: Optional[str] = None
     category: Optional[str] = None
     tags: Optional[str] = None
-    relevance: float  # ← добавили поле релевантности
+    relevance: float
 
 class SearchRequest(BaseModel):
     query: str

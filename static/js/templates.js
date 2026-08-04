@@ -7,39 +7,26 @@ async function loadDocumentTemplates() {
         return;
     }
 
-    if (typeof supabaseClient === 'undefined') {
-        console.error('Supabase-клиент не подключён');
-
-        templatesGrid.innerHTML =
-            '<p class="templates-status">Не удалось загрузить шаблоны.</p>';
-
-        return;
-    }
-
     try {
-        const { data: templates, error } = await supabaseClient
-            .from('document_templates')
-            .select(`
-                id,
-                slug,
-                title,
-                short_description,
-                preview_image_url,
-                sort_order
-            `)
-            .eq('is_published', true)
-            .order('sort_order', { ascending: true });
-
-        if (error) {
-            throw error;
+        if (typeof API_BASE === 'undefined') {
+            throw new Error('API_BASE не определён. Проверьте config.js');
         }
+
+        console.log('Загрузка шаблонов из:', `${API_BASE}/templates?limit=50`);
+
+        const response = await fetch(`${API_BASE}/templates?limit=50`);
+
+        if (!response.ok) {
+            throw new Error(`Ошибка HTTP: ${response.status}`);
+        }
+
+        const templates = await response.json();
 
         templatesGrid.innerHTML = '';
 
         if (!templates || templates.length === 0) {
             templatesGrid.innerHTML =
                 '<p class="templates-status">Шаблоны пока не добавлены.</p>';
-
             return;
         }
 
@@ -47,9 +34,9 @@ async function loadDocumentTemplates() {
             const card = createTemplateCard(template);
             templatesGrid.appendChild(card);
         });
+
     } catch (error) {
         console.error('Ошибка загрузки шаблонов:', error);
-
         templatesGrid.innerHTML =
             '<p class="templates-status">Не удалось загрузить шаблоны.</p>';
     }
@@ -68,7 +55,6 @@ function createTemplateCard(template) {
 
     const openTemplate = () => {
         const slug = encodeURIComponent(template.slug);
-
         window.location.href =
             `static/html/template_viewer.html?slug=${slug}`;
     };

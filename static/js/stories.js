@@ -107,10 +107,7 @@ function closeStoryModal() {
     }
 }
 
-// Делаем функции доступными глобально
 window.openStoryModal = openStoryModal;
 window.closeStoryModal = closeStoryModal;
 
-// Загружаем истории. Промис сохраняем, чтобы другие скрипты
-// могли дождаться (await window.storiesLoaded) полной загрузки данных.
 window.storiesLoaded = loadStoriesFromAPI();

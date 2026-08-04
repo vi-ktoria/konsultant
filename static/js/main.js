@@ -72,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Регистрируем callback для рендеринга после загрузки данных
     window.renderStoriesCallback = renderStories;
 
     // ===== Закрытие модального окна по клику на фон или крестик =====
@@ -187,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(updateTemplatesButtons, 100);
     }
 
-    // Если истории уже загружены, рендерим сразу
     if (window.storiesData && window.storiesData.length > 0) {
         renderStories();
     }

@@ -15,11 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
             sidebarContainer.innerHTML = html;
             sidebarContainer.dataset.loaded = 'true';
 
-            // Определяем текущую страницу
             const currentPath = window.location.pathname;
             const currentPage = currentPath.split('/').pop() || 'index.html';
 
-            // Скрываем блоки в зависимости от страницы
             if ((currentPage === 'start-guide.html') || (currentPage === 'index.html')) {
                 const startCard = sidebarContainer.querySelector('.article-start-card');
                 if (startCard) startCard.style.display = 'none';
@@ -49,7 +47,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
-            // Инициализируем поиск
             if (typeof initSearch === 'function') {
                 initSearch();
             }
@@ -58,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Ошибка загрузки боковой панели:', error);
         });
-    // После загрузки sidebar
+
     if (typeof initSearch === 'function') {
         initSearch();
     }

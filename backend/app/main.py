@@ -10,7 +10,8 @@ from .routers import (
     stories_router,
     risks_router,
     faq_router,
-    search_router
+    search_router,
+    templates_router
 )
 from .config import config
 from .crud import get_all_content_cached, get_content_by_slug_cached, search_content_cached
@@ -37,6 +38,7 @@ app.include_router(stories_router, prefix=config.API_PREFIX)
 app.include_router(risks_router, prefix=config.API_PREFIX)
 app.include_router(faq_router, prefix=config.API_PREFIX)
 app.include_router(search_router, prefix=config.API_PREFIX)
+app.include_router(templates_router, prefix=config.API_PREFIX)
 
 @app.get("/")
 def root():

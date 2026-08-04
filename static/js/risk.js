@@ -142,7 +142,7 @@ async function loadRiskFromAPI() {
         descriptionElement.textContent = '';
         introElement.innerHTML = '';
         contentElement.innerHTML = `
-            <p style="color: #e74c3c;">❌ ${error.message}</p>
+            <p style="color: #e74c3c;">${error.message}</p>
             <p><a href="risks.html">Вернуться к списку рисков</a></p>
         `;
     }

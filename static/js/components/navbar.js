@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const navbarContainer = document.getElementById('navbarContainer');
     if (!navbarContainer) return;
 
-    // Проверяем, загружен ли уже навбар
     if (navbarContainer.dataset.loaded === 'true') return;
 
     fetch('/static/html/components/navbar.html')
@@ -16,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
             navbarContainer.innerHTML = html;
             navbarContainer.dataset.loaded = 'true';
             
-            // Подсвечиваем активную ссылку
             const currentPath = window.location.pathname;
             const links = navbarContainer.querySelectorAll('.nav-links a');
             links.forEach(link => {

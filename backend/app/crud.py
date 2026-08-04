@@ -56,7 +56,7 @@ def search_content(query: str, limit: int = 20, content_type: str = None):
 def search_content_cached(query: str, limit: int = 20, content_type: str = None):
     return search_content(query, limit, content_type)
 
-# ===== Поиск с ранжированием (вариант 3) =====
+# ===== Поиск с ранжированием =====
 def search_content_with_rank(query: str, limit: int = 20, content_type: str = None):
     """
     Поиск с использованием RPC-функции search_with_rank в Supabase.
@@ -81,7 +81,6 @@ def search_content_with_rank(query: str, limit: int = 20, content_type: str = No
         return data
     except Exception as e:
         print(f"Ошибка поиска с ранжированием: {e}")
-        # Если RPC-функция не работает, используем обычный поиск как fallback
         return search_content(query, limit, content_type)
 
 @lru_cache(maxsize=100)

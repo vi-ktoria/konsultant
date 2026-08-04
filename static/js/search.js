@@ -1,7 +1,6 @@
 function initSearch() {
     const searchInputs = document.querySelectorAll('[data-search-input]');
 
-    // Проверяем, находимся ли мы на главной странице
     function isHomePage() {
         const path = window.location.pathname;
         return path === '/' || path === '/index.html' || path === '';
@@ -25,7 +24,6 @@ function initSearch() {
 
                 if (type === 'story') {
                     if (isHomePage()) {
-                        // На главной — открываем модальное окно
                         if (typeof window.openStoryModal === 'function') {
                             const story = window.storiesData?.find(s => s.slug === slug);
                             if (story) {
@@ -42,12 +40,10 @@ function initSearch() {
                             }
                         }
                     } else {
-                        // Не на главной — переходим на главную с параметром в query string
                         window.location.href = `/index.html?story=${encodeURIComponent(slug)}`;
                     }
                 } else if (type === 'faq') {
                     if (isHomePage()) {
-                        // На главной — разворачиваем FAQ
                         const faqItems = document.querySelectorAll('.faq-item');
                         let targetFaq = null;
 
@@ -77,7 +73,6 @@ function initSearch() {
                             targetFaq.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                     } else {
-                        // Не на главной — переходим на главную с параметром в query string
                         window.location.href = `/index.html?faq=${encodeURIComponent(slug)}`;
                     }
                 } else if (href && href !== '#' && href !== '') {

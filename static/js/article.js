@@ -143,7 +143,7 @@ async function loadArticleFromAPI() {
         descriptionElement.textContent = '';
         introElement.innerHTML = '';
         contentElement.innerHTML = `
-            <p style="color: #e74c3c;">❌ ${error.message}</p>
+            <p style="color: #e74c3c;">${error.message}</p>
             <p><a href="articles.html">Вернуться к списку статей</a></p>
         `;
     }

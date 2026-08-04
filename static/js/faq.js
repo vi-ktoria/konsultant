@@ -73,8 +73,6 @@ async function loadFaq() {
     }
 }
 
-// Промис сохраняем в window.faqLoaded, чтобы другие скрипты
-// могли дождаться (await window.faqLoaded) полной отрисовки FAQ.
 document.addEventListener('DOMContentLoaded', function () {
     window.faqLoaded = loadFaq();
 });
